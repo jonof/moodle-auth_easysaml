@@ -107,6 +107,9 @@ class auth_plugin_simplesaml extends auth_plugin_base {
     }
 
     private function apply_config_defaults($config) {
+        if (!isset($config->idp_name) || $config->idp_name === '') {
+            $config->idp_name = get_string('defaultidpname', 'auth_simplesaml');
+        }
         if (!isset($config->idp_entityid)) {
             $config->idp_entityid = '';
         }
@@ -136,6 +139,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
     public function process_config($config) {
         $this->apply_config_defaults($config);
 
+        set_config('idp_name', $config->idp_name, self::CONFIGNAME);
         set_config('idp_entityid', $config->idp_entityid, self::CONFIGNAME);
         set_config('idp_ssourl', $config->idp_ssourl, self::CONFIGNAME);
         set_config('idp_slourl', $config->idp_slourl, self::CONFIGNAME);
@@ -149,11 +153,15 @@ class auth_plugin_simplesaml extends auth_plugin_base {
     }
 
     public function loginpage_idp_list($wantsurl) {
+        if (!auth_simplesaml_helper::is_configured()) {
+            return array();
+        }
+
         return array(
             array(
                 'url' => new moodle_url(get_login_url(), array('sso' => 1)),
-                'icon' => new pix_icon('i/guest', ''),
-                'name' => get_string('defaultidpname', 'auth_simplesaml'),
+                'icon' => new pix_icon('idp', '', 'auth_simplesaml'),
+                'name' => $this->config->idp_name,
             )
         );
     }

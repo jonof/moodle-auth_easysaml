@@ -65,8 +65,13 @@ global $OUTPUT;
 */
 ?>
     <tr>
+        <td><label for="idp_name"><?php echo get_string('idp_name', 'auth_simplesaml') ?></label></td>
+        <td><input name="idp_name" id="idp_name" type="text" size="30" value="<?php echo s($config->idp_name) ?>"></td>
+        <td class="desc"><?php echo get_string('idp_name_desc', 'auth_simplesaml') ?></td>
+    </tr>
+
         <td><label for="username_attribute"><?php echo get_string('username_attribute', 'auth_simplesaml') ?></label></td>
-        <td><input name="username_attribute" id="username_attribute" type="text" size="30" value="<?php echo s($config->username_attribute) ?>">
+        <td><input name="username_attribute" id="username_attribute" type="text" size="30" value="<?php echo s($config->username_attribute) ?>"></td>
         <td class="desc"><?php echo get_string('username_attribute_desc', 'auth_simplesaml') ?></td>
     </tr>
 
