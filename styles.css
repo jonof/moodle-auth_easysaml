@@ -1,0 +1,9 @@
+#page-admin-auth-simplesaml table.configtable td {
+}
+#page-admin-auth-simplesaml table.configtable td {
+    padding-bottom: 0.5em;
+}
+#page-admin-auth-simplesaml table.configtable td.desc {
+    font-size: 0.9em;
+    padding-left: 1.5em;
+}
