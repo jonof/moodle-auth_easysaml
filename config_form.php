@@ -70,10 +70,17 @@ global $OUTPUT;
         <td class="desc"><?php echo get_string('idp_name_desc', 'auth_simplesaml') ?></td>
     </tr>
 
+    <tr><td colspan="3"><?php echo $OUTPUT->heading(get_string('configgeneral', 'auth_simplesaml')) ?></td></tr>
+    <tr>
         <td><label for="username_attribute"><?php echo get_string('username_attribute', 'auth_simplesaml') ?></label></td>
         <td><input name="username_attribute" id="username_attribute" type="text" size="30" value="<?php echo s($config->username_attribute) ?>"></td>
         <td class="desc"><?php echo get_string('username_attribute_desc', 'auth_simplesaml') ?></td>
     </tr>
+    <tr>
+        <td><label for="prefersso"><?php echo get_string('prefersso', 'auth_simplesaml') ?></label></td>
+        <td><input name="prefersso" id="prefersso" type="checkbox" value="1" <?php echo $config->prefersso ? 'checked' : '' ?>></td>
+        <td class="desc"><?php echo get_string('prefersso_desc', 'auth_simplesaml', get_login_url() . '?nosso') ?></td>
+    </tr>        
 
     <?php print_auth_lock_options('simplesaml', $this->userfields, null, true, false); ?>
 </table>

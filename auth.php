@@ -46,7 +46,28 @@ class auth_plugin_simplesaml extends auth_plugin_base {
     public function loginpage_hook() {
         global $frm, $SESSION;
 
-        if (!isset($_GET['sso'])) {
+        if (!auth_simplesaml_helper::is_configured()) {
+            return;
+        }
+
+        if (isset($_GET['sso'])) {
+            // Explicitly do want redirection.
+            $wantsso = true;
+            unset($SESSION->auth_simplesaml_nosso);
+        } else if (isset($_GET['nosso'])) {
+            // Explicitly don't want redirection.
+            $wantsso = false;
+
+            // Remember this so if the user fails on the login form we
+            // don't try and redirect them on reloading.
+            $SESSION->auth_simplesaml_nosso = true;
+        } else {
+            // Be guided by configuration preference and whether
+            // we avoided redirection last time through.
+            $wantsso = !empty($this->config->prefersso) &&
+                empty($SESSION->auth_simplesaml_nosso);
+        }
+        if (!$wantsso) {
             return;
         }
 
@@ -125,7 +146,9 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         if (!isset($config->idp_certfingerprint)) {
             $config->idp_certfingerprint = '';
         }
-
+        if (!isset($config->prefersso)) {
+            $config->prefersso = 0;
+        }
         if (!isset($config->username_attribute)) {
             $config->username_attribute = '';
         }
@@ -146,6 +169,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         set_config('idp_cert', $config->idp_cert, self::CONFIGNAME);
         set_config('idp_certfingerprint', $config->idp_certfingerprint, self::CONFIGNAME);
         set_config('username_attribute', $config->username_attribute, self::CONFIGNAME);
+        set_config('prefersso', !empty($config->prefersso), self::CONFIGNAME);
 
         // Field mappings/locks/etc are saved by the caller.
 
