@@ -48,8 +48,7 @@ class auth_simplesaml_helper {
 
         if (empty($config->idp_entityid) ||
             empty($config->idp_ssourl) ||
-            empty($config->idp_slourl) ||
-            empty($config->idp_certfingerprint) ||
+            (empty($config->idp_cert) && empty($config->idp_certfingerprint)) ||
             empty($config->username_attribute)) {
             return false;
         }
