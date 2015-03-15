@@ -73,6 +73,11 @@ global $OUTPUT;
         <td><textarea name="sp_privatekey" id="sp_privatekey" rows="3" cols="40"><?php echo s($config->sp_privatekey) ?></textarea></td>
         <td class="desc"><?php echo get_string('sp_privatekey_desc', 'auth_simplesaml') ?></td>
     </tr>
+    <tr>
+        <td><label for="signmetadata"><?php echo get_string('signmetadata', 'auth_simplesaml') ?></label></td>
+        <td><input name="signmetadata" id="signmetadata" type="checkbox" value="1" <?php echo $config->signmetadata ? 'checked' : '' ?>></td>
+        <td class="desc"></td>
+    </tr>        
 <?php
     } else {
         echo '<tr><td colspan="3">';

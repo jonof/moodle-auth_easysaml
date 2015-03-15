@@ -1,7 +1,7 @@
 <?php
 
 $string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin';
-$string['configencryption'] = 'Encryption';
+$string['configencryption'] = 'Encryption and signing';
 $string['configgeneral'] = 'General';
 $string['configidp'] = 'Identity Provider (IdP)';
 $string['defaultidpname'] = 'SAML';
@@ -28,5 +28,6 @@ $string['sp_cert'] = 'SP certificate';
 $string['sp_cert_desc'] = 'The Base64-encoded X.509 certificate (DER or PEM format) to use for encrypting this site\'s interaction with the IdP, if the IdP requires it. The private key must also be provided.';
 $string['sp_privatekey'] = 'SP private key';
 $string['sp_privatekey_desc'] = 'The Base64-encoded private key (DER or PEM format) that corresponds to the "SP certificate".';
+$string['signmetadata'] = 'Sign metadata';
 $string['username_attribute'] = 'Username attribute';
 $string['username_attribute_desc'] = 'The attribute that maps as the Moodle username.';

@@ -135,12 +135,17 @@ class auth_simplesaml_helper {
                     'url' => $config->idp_slourl,
                 ),
             ),
+
+            // Security settings.
+            'security' => array(),
         );
 
         if (extension_loaded('mcrypt')) {
             if (!empty($config->sp_cert) && !empty($config->sp_privatekey)) {
                 $settings['sp']['x509cert'] = $config->sp_cert;
                 $settings['sp']['privateKey'] = $config->sp_privatekey;
+
+                $settings['security']['signMetadata'] = !empty($config->signmetadata);
             }
         }
 

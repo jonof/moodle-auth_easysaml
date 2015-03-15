@@ -158,6 +158,9 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         if (!isset($config->sp_privatekey)) {
             $config->sp_privatekey = '';
         }
+        if (!isset($config->signmetadata)) {
+            $config->signmetadata = 0;
+        }
     }
 
     public function config_form($config, $err, $user_fields) {
@@ -178,6 +181,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         set_config('prefersso', !empty($config->prefersso), self::CONFIGNAME);
         set_config('sp_cert', $config->sp_cert, self::CONFIGNAME);
         set_config('sp_privatekey', $config->sp_privatekey, self::CONFIGNAME);
+        set_config('signmetadata', $config->signmetadata, self::CONFIGNAME);
 
         // Field mappings/locks/etc are saved by the caller.
 
