@@ -48,7 +48,6 @@ class auth_simplesaml_helper {
 
         if (empty($config->idp_entityid) ||
             empty($config->idp_ssourl) ||
-            (empty($config->idp_cert) && empty($config->idp_certfingerprint)) ||
             empty($config->username_attribute)) {
             return false;
         }
@@ -144,14 +143,23 @@ class auth_simplesaml_helper {
             if (!empty($config->sp_cert) && !empty($config->sp_privatekey)) {
                 $settings['sp']['x509cert'] = $config->sp_cert;
                 $settings['sp']['privateKey'] = $config->sp_privatekey;
-
-                $settings['security']['signMetadata'] = !empty($config->signmetadata);
             }
+
+            $settings['security']['signMetadata'] = !empty($config->signmetadata);
+            $settings['security']['nameIdEncrypted'] = !empty($config->encryptnameid);
+            $settings['security']['authnRequestsSigned'] = !empty($config->signauthrequests);
+            $settings['security']['logoutRequestSigned'] = !empty($config->signlogoutrequests);
+            $settings['security']['logoutResponseSigned'] = !empty($config->signlogoutresponses);
+            $settings['security']['wantAssertionsEncrypted'] = !empty($config->wantencryptedasserts);
+            $settings['security']['wantNameIdEncrypted'] = !empty($config->wantencryptednameid);
+            $settings['security']['wantAssertionsSigned'] = !empty($config->wantsignedasserts);
+            $settings['security']['wantMessagesSigned'] = !empty($config->wantsignedmessages);
         }
 
         if (!empty($config->idp_cert)) {
             $settings['idp']['x509cert'] = $config->idp_cert;
-        } else if (!empty($config->idp_certfingerprint)) {
+        }
+        if (!empty($config->idp_certfingerprint)) {
             $settings['idp']['certFingerprint'] = $config->idp_certfingerprint;
         }
 
@@ -192,7 +200,7 @@ class auth_simplesaml_helper {
 
         $attrs = $auth->getAttributes();
         $userinfo = $this->process_attributes($attrs);
-        debugging('auth_simplesaml acs attributes: ' . var_export($attrs, true), DEBUG_DEVELOPER);
+        //debugging('auth_simplesaml acs attributes: ' . var_export($attrs, true), DEBUG_DEVELOPER);
         if (!isset($userinfo['username']) || trim($userinfo['username']) === '') {
             debugging('auth_simplesaml acs: no username attribute found in response', DEBUG_NORMAL);
             throw new moodle_exception('errornotauthenticated', 'auth_simplesaml');

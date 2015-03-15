@@ -1,10 +1,18 @@
 <?php
 
-$string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin';
-$string['configencryption'] = 'Encryption and signing';
+$string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin.';
+$string['configencryption'] = 'Encryption and Signing';
 $string['configgeneral'] = 'General';
 $string['configidp'] = 'Identity Provider (IdP)';
 $string['defaultidpname'] = 'SAML';
+$string['encryptionconfignote'] = 'These settings define the signing and encryption expectations of the Identity Provider and this site.
+<ul>
+<li><em>Sign</em> and <em>Require encrypted</em> options require the SP certificate and private key be configured.</li>
+<li><em>Require signed</em> options require the IdP certificate or fingerprint be configured.</li>
+<li><em>Encrypt the name ID</em> requires the IdP certificate be configured. (The fingerprint is not enough.)</li>
+</ul>
+';
+$string['encryptnameid'] = 'Encrypt the name ID';
 $string['errorbadconfiguration'] = 'The plugin is not configured correctly.';
 $string['errornotauthenticated'] = 'Authentication was not successful.';
 $string['errornotconfigured'] = 'The plugin has not been fully configured.';
@@ -28,6 +36,13 @@ $string['sp_cert'] = 'SP certificate';
 $string['sp_cert_desc'] = 'The Base64-encoded X.509 certificate (DER or PEM format) to use for encrypting this site\'s interaction with the IdP, if the IdP requires it. The private key must also be provided.';
 $string['sp_privatekey'] = 'SP private key';
 $string['sp_privatekey_desc'] = 'The Base64-encoded private key (DER or PEM format) that corresponds to the "SP certificate".';
+$string['signauthrequests'] = 'Sign authentication requests';
+$string['signlogoutrequests'] = 'Sign logout requests';
+$string['signlogoutresponses'] = 'Sign logout responses';
 $string['signmetadata'] = 'Sign metadata';
 $string['username_attribute'] = 'Username attribute';
-$string['username_attribute_desc'] = 'The attribute that maps as the Moodle username.';
+$string['username_attribute_desc'] = 'The attribute that maps to the Moodle username.';
+$string['wantencryptedasserts'] = 'Require encrypted assertions';
+$string['wantencryptednameid'] = 'Require encrypted name ID';
+$string['wantsignedasserts'] = 'Require signed assertions';
+$string['wantsignedmessages'] = 'Require signed messages';

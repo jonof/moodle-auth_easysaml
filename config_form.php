@@ -76,7 +76,39 @@ global $OUTPUT;
     <tr>
         <td><label for="signmetadata"><?php echo get_string('signmetadata', 'auth_simplesaml') ?></label></td>
         <td><input name="signmetadata" id="signmetadata" type="checkbox" value="1" <?php echo $config->signmetadata ? 'checked' : '' ?>></td>
-        <td class="desc"></td>
+        <td class="desc" rowspan="9"><?php echo get_string('encryptionconfignote', 'auth_simplesaml') ?></td>
+    </tr>        
+    <tr>
+        <td><label for="signauthrequests"><?php echo get_string('signauthrequests', 'auth_simplesaml') ?></label></td>
+        <td><input name="signauthrequests" id="signauthrequests" type="checkbox" value="1" <?php echo $config->signauthrequests ? 'checked' : '' ?>></td>
+    </tr>        
+    <tr>
+        <td><label for="signlogoutrequests"><?php echo get_string('signlogoutrequests', 'auth_simplesaml') ?></label></td>
+        <td><input name="signlogoutrequests" id="signlogoutrequests" type="checkbox" value="1" <?php echo $config->signlogoutrequests ? 'checked' : '' ?>></td>
+    </tr>        
+    <tr>
+        <td><label for="signlogoutresponses"><?php echo get_string('signlogoutresponses', 'auth_simplesaml') ?></label></td>
+        <td><input name="signlogoutresponses" id="signlogoutresponses" type="checkbox" value="1" <?php echo $config->signlogoutresponses ? 'checked' : '' ?>></td>
+    </tr>        
+    <tr>
+        <td><label for="encryptnameid"><?php echo get_string('encryptnameid', 'auth_simplesaml') ?></label></td>
+        <td><input name="encryptnameid" id="encryptnameid" type="checkbox" value="1" <?php echo $config->encryptnameid ? 'checked' : '' ?>></td>
+    </tr>        
+    <tr>
+        <td><label for="wantencryptedasserts"><?php echo get_string('wantencryptedasserts', 'auth_simplesaml') ?></label></td>
+        <td><input name="wantencryptedasserts" id="wantencryptedasserts" type="checkbox" value="1" <?php echo $config->wantencryptedasserts ? 'checked' : '' ?>></td>
+    </tr>        
+    <tr>
+        <td><label for="wantencryptednameid"><?php echo get_string('wantencryptednameid', 'auth_simplesaml') ?></label></td>
+        <td><input name="wantencryptednameid" id="wantencryptednameid" type="checkbox" value="1" <?php echo $config->wantencryptednameid ? 'checked' : '' ?>></td>
+    </tr>        
+    <tr>
+        <td><label for="wantsignedasserts"><?php echo get_string('wantsignedasserts', 'auth_simplesaml') ?></label></td>
+        <td><input name="wantsignedasserts" id="wantsignedasserts" type="checkbox" value="1" <?php echo $config->wantsignedasserts ? 'checked' : '' ?>></td>
+    </tr>        
+    <tr>
+        <td><label for="wantsignedmessages"><?php echo get_string('wantsignedmessages', 'auth_simplesaml') ?></label></td>
+        <td><input name="wantsignedmessages" id="wantsignedmessages" type="checkbox" value="1" <?php echo $config->wantsignedmessages ? 'checked' : '' ?>></td>
     </tr>        
 <?php
     } else {

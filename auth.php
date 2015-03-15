@@ -161,6 +161,30 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         if (!isset($config->signmetadata)) {
             $config->signmetadata = 0;
         }
+        if (!isset($config->encryptnameid)) {
+            $config->encryptnameid = 0;
+        }
+        if (!isset($config->signauthrequests)) {
+            $config->signauthrequests = 0;
+        }
+        if (!isset($config->signlogoutrequests)) {
+            $config->signlogoutrequests = 0;
+        }
+        if (!isset($config->signlogoutresponses)) {
+            $config->signlogoutresponses = 0;
+        }
+        if (!isset($config->wantencryptedasserts)) {
+            $config->wantencryptedasserts = 0;
+        }
+        if (!isset($config->wantsignedasserts)) {
+            $config->wantsignedasserts = 0;
+        }
+        if (!isset($config->wantencryptednameid)) {
+            $config->wantencryptednameid = 0;
+        }
+        if (!isset($config->wantsignedmessages)) {
+            $config->wantsignedmessages = 0;
+        }
     }
 
     public function config_form($config, $err, $user_fields) {
@@ -182,6 +206,14 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         set_config('sp_cert', $config->sp_cert, self::CONFIGNAME);
         set_config('sp_privatekey', $config->sp_privatekey, self::CONFIGNAME);
         set_config('signmetadata', $config->signmetadata, self::CONFIGNAME);
+        set_config('encryptnameid', $config->encryptnameid, self::CONFIGNAME);
+        set_config('signauthrequests', $config->signauthrequests, self::CONFIGNAME);
+        set_config('signlogoutrequests', $config->signlogoutrequests, self::CONFIGNAME);
+        set_config('signlogoutresponses', $config->signlogoutresponses, self::CONFIGNAME);
+        set_config('wantencryptedasserts', $config->wantencryptedasserts, self::CONFIGNAME);
+        set_config('wantsignedasserts', $config->wantsignedasserts, self::CONFIGNAME);
+        set_config('wantencryptednameid', $config->wantencryptednameid, self::CONFIGNAME);
+        set_config('wantsignedmessages', $config->wantsignedmessages, self::CONFIGNAME);
 
         // Field mappings/locks/etc are saved by the caller.
 
