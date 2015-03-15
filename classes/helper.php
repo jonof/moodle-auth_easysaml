@@ -137,6 +137,13 @@ class auth_simplesaml_helper {
             ),
         );
 
+        if (extension_loaded('mcrypt')) {
+            if (!empty($config->sp_cert) && !empty($config->sp_privatekey)) {
+                $settings['sp']['x509cert'] = $config->sp_cert;
+                $settings['sp']['privateKey'] = $config->sp_privatekey;
+            }
+        }
+
         if (!empty($config->idp_cert)) {
             $settings['idp']['x509cert'] = $config->idp_cert;
         } else if (!empty($config->idp_certfingerprint)) {

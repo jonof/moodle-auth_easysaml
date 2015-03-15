@@ -1,6 +1,7 @@
 <?php
 
 $string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin';
+$string['configencryption'] = 'Encryption';
 $string['configgeneral'] = 'General';
 $string['configidp'] = 'Identity Provider (IdP)';
 $string['defaultidpname'] = 'SAML';
@@ -16,12 +17,16 @@ $string['idp_ssourl_desc'] = 'The URL of the Single Sign On service using "HTTP-
 $string['idp_slourl'] = 'SLO URL';
 $string['idp_slourl_desc'] = 'The URL of the Single Log Out service using "HTTP-Redirect" binding.';
 $string['idp_cert'] = 'Certificate';
-$string['idp_cert_desc'] = 'Base64-encoded X.509 certificate that signs SAML IdP responses (begins <code>MII...</code>). You can provide this, or just the \'Certificate fingerprint\'.';
+$string['idp_cert_desc'] = 'The Base64-encoded X.509 certificate (DER or PEM format) that signs SAML IdP responses. You can provide this or the \'Certificate fingerprint\'.';
 $string['idp_certfingerprint'] = 'Certificate fingerprint';
 $string['idp_certfingerprint_desc'] = 'The <strong>SHA1</strong> fingerprint of the certificate that signs SAML IdP responses (formatted <code>XX:XX:XX:...:XX</code>). This is a simpler method for validating the signature if you don\'t wish to use the full certificate.';
 $string['nomcryptnotice'] = 'The PHP mcrypt module is not enabled so encryption, decryption, and signing functions are not available.';
 $string['pluginname'] = 'Simplified SAML';
 $string['prefersso'] = 'Prefer SSO';
 $string['prefersso_desc'] = 'Whether to automatically send the user for sign on when the login page is accessed. When this is enabled, the redirection can be avoided with <code>{$a}</code>.';
+$string['sp_cert'] = 'SP certificate';
+$string['sp_cert_desc'] = 'The Base64-encoded X.509 certificate (DER or PEM format) to use for encrypting this site\'s interaction with the IdP, if the IdP requires it. The private key must also be provided.';
+$string['sp_privatekey'] = 'SP private key';
+$string['sp_privatekey_desc'] = 'The Base64-encoded private key (DER or PEM format) that corresponds to the "SP certificate".';
 $string['username_attribute'] = 'Username attribute';
 $string['username_attribute_desc'] = 'The attribute that maps as the Moodle username.';

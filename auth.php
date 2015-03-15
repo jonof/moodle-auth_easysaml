@@ -152,6 +152,12 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         if (!isset($config->username_attribute)) {
             $config->username_attribute = '';
         }
+        if (!isset($config->sp_cert)) {
+            $config->sp_cert = '';
+        }
+        if (!isset($config->sp_privatekey)) {
+            $config->sp_privatekey = '';
+        }
     }
 
     public function config_form($config, $err, $user_fields) {
@@ -170,6 +176,8 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         set_config('idp_certfingerprint', $config->idp_certfingerprint, self::CONFIGNAME);
         set_config('username_attribute', $config->username_attribute, self::CONFIGNAME);
         set_config('prefersso', !empty($config->prefersso), self::CONFIGNAME);
+        set_config('sp_cert', $config->sp_cert, self::CONFIGNAME);
+        set_config('sp_privatekey', $config->sp_privatekey, self::CONFIGNAME);
 
         // Field mappings/locks/etc are saved by the caller.
 

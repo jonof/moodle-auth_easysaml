@@ -53,22 +53,33 @@ global $OUTPUT;
         <td><input name="idp_certfingerprint" id="idp_certfingerprint" type="text" size="40" value="<?php echo s($config->idp_certfingerprint) ?>"></td>
         <td class="desc"><?php echo get_string('idp_certfingerprint_desc', 'auth_simplesaml') ?></td>
     </tr>
-<?php
-/* Encryption options still to come.
-    if (!extension_loaded('mcrypt')) {
-
-    } else {
-        echo '<tr><td colspan="3">';
-        echo $OUTPUT->notification(get_string('nomcryptnotice', 'auth_simplesaml'));
-        echo '</td></tr>';
-    }
-*/
-?>
     <tr>
         <td><label for="idp_name"><?php echo get_string('idp_name', 'auth_simplesaml') ?></label></td>
         <td><input name="idp_name" id="idp_name" type="text" size="30" value="<?php echo s($config->idp_name) ?>"></td>
         <td class="desc"><?php echo get_string('idp_name_desc', 'auth_simplesaml') ?></td>
     </tr>
+
+<?php
+    if (extension_loaded('mcrypt')) {
+?>
+    <tr><td colspan="3"><?php echo $OUTPUT->heading(get_string('configencryption', 'auth_simplesaml')) ?></td></tr>
+    <tr>
+        <td><label for="sp_cert"><?php echo get_string('sp_cert', 'auth_simplesaml') ?></label></td>
+        <td><textarea name="sp_cert" id="sp_cert" rows="3" cols="40"><?php echo s($config->sp_cert) ?></textarea></td>
+        <td class="desc"><?php echo get_string('sp_cert_desc', 'auth_simplesaml') ?></td>
+    </tr>
+    <tr>
+        <td><label for="sp_privatekey"><?php echo get_string('sp_privatekey', 'auth_simplesaml') ?></label></td>
+        <td><textarea name="sp_privatekey" id="sp_privatekey" rows="3" cols="40"><?php echo s($config->sp_privatekey) ?></textarea></td>
+        <td class="desc"><?php echo get_string('sp_privatekey_desc', 'auth_simplesaml') ?></td>
+    </tr>
+<?php
+    } else {
+        echo '<tr><td colspan="3">';
+        echo $OUTPUT->notification(get_string('nomcryptnotice', 'auth_simplesaml'));
+        echo '</td></tr>';
+    }
+?>
 
     <tr><td colspan="3"><?php echo $OUTPUT->heading(get_string('configgeneral', 'auth_simplesaml')) ?></td></tr>
     <tr>
