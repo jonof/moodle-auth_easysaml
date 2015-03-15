@@ -6,7 +6,13 @@ The perks of this plugin:
     on webserver extensions or third-party SAML service
     provider packages.
   - No loss of access to Moodle manual accounts or other
-    authentication schemes.
+    authentication schemes. Sign-on redirection can be enabled
+    to happen automatically, but you can still bypass it as
+    need be.
+
+The limitations of this plugin:
+  - No enrolment handling functionality. This is a simplified
+    plugin after all.
 
 The PHP mcrypt extension is required for SAML signing,
 encryption, and decryption functionality.
@@ -19,3 +25,7 @@ this plugin.
 Adjustments were made in Saml2/Auth.php processSLO() to call
 Moodle's session logout function instead of destroying the
 PHP session directly.
+
+This plugin was developed using simpleSAMLphp as IdP and has
+had (to date) limited use with F5 APM as IdP.
+
