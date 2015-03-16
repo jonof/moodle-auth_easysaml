@@ -118,13 +118,6 @@ class auth_simplesaml_helper {
                 'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
             ),
 
-            'contactPerson' => array(
-                'support' => array(
-                    'givenName' => $CFG->supportname,
-                    'emailAddress' => $CFG->supportemail,
-                ),
-            ),
-
             // Define our identity provider.
             'idp' => array(
                 'entityId' => $config->idp_entityid,
@@ -139,6 +132,15 @@ class auth_simplesaml_helper {
             // Security settings.
             'security' => array(),
         );
+
+        if (!empty($CFG->supportname) && !empty($CFG->supportemail)) {
+            $settings['contactPerson'] = array(
+                'support' => array(
+                    'givenName' => $CFG->supportname,
+                    'emailAddress' => $CFG->supportemail,
+                ),
+            );
+        }
 
         if (extension_loaded('mcrypt')) {
             if (!empty($config->sp_cert) && !empty($config->sp_privatekey)) {
