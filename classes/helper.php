@@ -115,6 +115,7 @@ class auth_simplesaml_helper {
                 'singleLogoutService' => array(
                     'url' => $CFG->wwwroot . '/auth/simplesaml/sls.php',
                 ),
+                'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
             ),
 
             'contactPerson' => array(
