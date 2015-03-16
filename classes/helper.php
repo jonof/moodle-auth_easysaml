@@ -155,9 +155,9 @@ class auth_simplesaml_helper {
             $settings['security']['logoutResponseSigned'] = !empty($config->signlogoutresponses);
             $settings['security']['wantAssertionsEncrypted'] = !empty($config->wantencryptedasserts);
             $settings['security']['wantNameIdEncrypted'] = !empty($config->wantencryptednameid);
-            $settings['security']['wantAssertionsSigned'] = !empty($config->wantsignedasserts);
-            $settings['security']['wantMessagesSigned'] = !empty($config->wantsignedmessages);
         }
+        $settings['security']['wantAssertionsSigned'] = !empty($config->wantsignedasserts);
+        $settings['security']['wantMessagesSigned'] = !empty($config->wantsignedmessages);
 
         if (!empty($config->idp_cert)) {
             $settings['idp']['x509cert'] = $config->idp_cert;
