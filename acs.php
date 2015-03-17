@@ -32,5 +32,7 @@ if (!$helper->handle_acs()) {
 
 $redirect = optional_param('RelayState', null, PARAM_LOCALURL);
 if (!empty($redirect)) {
-    redirect($redirect);
+    redirect(new moodle_url($redirect));
 }
+
+redirect($CFG->wwwroot . '/');

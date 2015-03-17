@@ -75,7 +75,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         if (!isset($SESSION->auth_simplesaml_userinfo) ||
                 !is_array($SESSION->auth_simplesaml_userinfo)) {
             $url = new moodle_url(get_login_url(), array('sso' => 1));
-            $auth->login((string)$url);
+            $auth->login($url->out_as_local_url(false));
 
             throw new coding_exception("shouldn't have reached here");
         }
