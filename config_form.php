@@ -44,6 +44,17 @@ global $OUTPUT;
         <td class="desc"><?php echo get_string('idp_slourl_desc', 'auth_simplesaml') ?></td>
     </tr>
     <tr>
+        <td><label for="idp_slobinding"><?php echo get_string('idp_slobinding', 'auth_simplesaml') ?></label></td>
+        <td><?php
+            $options = array(
+                'redirect' => get_string('bindingredirect', 'auth_simplesaml'),
+                'post' => get_string('bindingpost', 'auth_simplesaml'),
+            );
+            echo html_writer::select($options, 'idp_slobinding', $config->idp_slobinding, false, array('id' => 'idp_slobinding'));
+        ?></td>
+        <td class="desc"></td>
+    </tr>
+    <tr>
         <td><label for="idp_cert"><?php echo get_string('idp_cert', 'auth_simplesaml') ?></label></td>
         <td><textarea name="idp_cert" id="idp_cert" rows="3" cols="40"><?php echo s($config->idp_cert) ?></textarea></td>
         <td class="desc"><?php echo get_string('idp_cert_desc', 'auth_simplesaml') ?></td>

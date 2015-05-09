@@ -124,14 +124,17 @@ class auth_simplesaml_helper {
                 'singleSignOnService' => array(
                     'url' => $config->idp_ssourl,
                 ),
-                'singleLogoutService' => array(
-                    'url' => $config->idp_slourl,
-                ),
             ),
 
             // Security settings.
             'security' => array(),
         );
+
+        if (!empty($config->idp_slourl)) {
+            $settings['idp']['singleLogoutService'] = array(
+                'url' => $config->idp_slourl,
+            );
+        }
 
         if (!empty($CFG->supportname) && !empty($CFG->supportemail)) {
             $settings['contactPerson'] = array(

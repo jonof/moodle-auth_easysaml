@@ -122,6 +122,50 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         require_logout();
 
         $auth = $this->get_auth();
+
+        if ($this->config->idp_slobinding === 'post') {
+            // POST binding requires the client perform a HTTP POST of a form to the
+            // IdP, so we will emit the form, JavaScript required to trigger the
+            // hand off, and exit.
+            global $PAGE, $OUTPUT;
+
+            $PAGE->set_title(get_string('logout'));
+            $PAGE->set_cacheable(false);
+            $PAGE->requires->js_init_code('Y.one("#saml-logout").submit();');
+
+            echo $OUTPUT->header();
+            echo $OUTPUT->heading(get_string('logout'));
+
+            $formattrs = array(
+                'method' => 'POST',
+                'action' => $auth->getSLOurl(),
+                'id' => 'saml-logout',
+            );
+            echo html_writer::start_tag('form', $formattrs);
+
+            echo $OUTPUT->box_start('generalbox', 'notice');
+            echo html_writer::tag('p', get_string('logoutmessage', 'auth_simplesaml'));
+
+            echo html_writer::div(html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('continue'))), 'buttons');
+
+            $logoutRequest = new OneLogin_Saml2_LogoutRequest($auth->getSettings(), null, $nameid, $sessionindex);
+            $samlRequest = $logoutRequest->getRequest();
+            $relayState = $CFG->wwwroot . '/auth/simplesaml/sls.php';
+
+            // Undo the deflation that OneLogin_Saml2_LogoutRequest->getRequest()
+            // did since it expects to be doing a Redirect-style binding.
+            $samlRequest = base64_encode(gzinflate(base64_decode($samlRequest)));
+
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'SAMLRequest', 'value' => $samlRequest));
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'RelayState', 'value' => $relayState));
+            echo $OUTPUT->box_end();
+
+            echo html_writer::end_tag('form');
+
+            echo $OUTPUT->footer();
+            exit;
+        }
+
         $auth->logout($CFG->wwwroot . '/', array(), $nameid, $sessionindex);
 
         throw new coding_exception("shouldn't have reached here");
@@ -139,6 +183,9 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         }
         if (!isset($config->idp_slourl)) {
             $config->idp_slourl = '';
+        }
+        if (!isset($config->idp_slobinding)) {
+            $config->idp_slobinding = 'redirect';
         }
         if (!isset($config->idp_cert)) {
             $config->idp_cert = '';
@@ -199,6 +246,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         set_config('idp_entityid', $config->idp_entityid, self::CONFIGNAME);
         set_config('idp_ssourl', $config->idp_ssourl, self::CONFIGNAME);
         set_config('idp_slourl', $config->idp_slourl, self::CONFIGNAME);
+        set_config('idp_slobinding', $config->idp_slobinding, self::CONFIGNAME);
         set_config('idp_cert', $config->idp_cert, self::CONFIGNAME);
         set_config('idp_certfingerprint', $config->idp_certfingerprint, self::CONFIGNAME);
         set_config('username_attribute', $config->username_attribute, self::CONFIGNAME);
