@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Main class of OneLogin's PHP Toolkit
  *
@@ -174,6 +174,21 @@ class OneLogin_Saml2_Auth
 
                 $this->redirectTo($this->getSLOurl(), $parameters);
             }
+        } else if (isset($_POST) && isset($_POST['SAMLResponse'])) { //BEGIN JonoF
+            $logoutResponse = new OneLogin_Saml2_LogoutResponse($this->_settings, $_POST['SAMLResponse']);
+            if (!$logoutResponse->isValid($requestId, $retrieveParametersFromServer)) {
+                $this->_errors[] = 'invalid_logout_response';
+                $this->_errorReason = $logoutResponse->getError();
+            } else if ($logoutResponse->getStatus() !== OneLogin_Saml2_Constants::STATUS_SUCCESS) {
+                $this->_errors[] = 'logout_not_success';
+            } else {
+                if (!$keepLocalSession) {
+                    //BEGIN MOODLE
+                    //OneLogin_Saml2_Utils::deleteLocalSession();
+                    require_logout();
+                    //END MOODLE
+                }
+            }   //END JonoF
         } else {
             $this->_errors[] = 'invalid_binding';
             throw new OneLogin_Saml2_Error(

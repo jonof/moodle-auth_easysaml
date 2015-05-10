@@ -118,9 +118,6 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         $nameid = $SESSION->auth_simplesaml_nameid;
         $sessionindex = $SESSION->auth_simplesaml_sessionindex;
 
-        // Because login/logout.php won't get an opportunity to call this.
-        require_logout();
-
         $auth = $this->get_auth();
 
         if ($this->config->idp_slobinding === 'post') {
@@ -149,12 +146,8 @@ class auth_plugin_simplesaml extends auth_plugin_base {
             echo html_writer::div(html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('continue'))), 'buttons');
 
             $logoutRequest = new OneLogin_Saml2_LogoutRequest($auth->getSettings(), null, $nameid, $sessionindex);
-            $samlRequest = $logoutRequest->getRequest();
+            $samlRequest = base64_encode($logoutRequest->getRawRequest());
             $relayState = $CFG->wwwroot . '/auth/simplesaml/sls.php';
-
-            // Undo the deflation that OneLogin_Saml2_LogoutRequest->getRequest()
-            // did since it expects to be doing a Redirect-style binding.
-            $samlRequest = base64_encode(gzinflate(base64_decode($samlRequest)));
 
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'SAMLRequest', 'value' => $samlRequest));
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'RelayState', 'value' => $relayState));
@@ -165,6 +158,9 @@ class auth_plugin_simplesaml extends auth_plugin_base {
             echo $OUTPUT->footer();
             exit;
         }
+
+        // Because login/logout.php won't get an opportunity to call this.
+        require_logout();
 
         $auth->logout($CFG->wwwroot . '/', array(), $nameid, $sessionindex);
 
