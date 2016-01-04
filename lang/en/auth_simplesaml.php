@@ -1,6 +1,13 @@
 <?php
 
-$string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin.';
+$string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin.
+
+The IdP will need to be configured with these parameters:
+
+ * SP entity ID: `{$a->metadataurl}`
+ * Assertion Consumer Service URL: `{$a->acsurl}` (POST binding)
+ * Single Logout Service request/response URL: `{$a->slsurl}`
+';
 $string['bindingpost'] = 'POST';
 $string['bindingredirect'] = 'Redirect';
 $string['configencryption'] = 'Encryption and Signing';

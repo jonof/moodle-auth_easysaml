@@ -235,6 +235,15 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         include "config_form.php";
     }
 
+    public function get_description() {
+        $a = new stdClass();
+        $a->metadataurl = (string)new moodle_url('/auth/simplesaml/metadata.php');
+        $a->acsurl = (string)new moodle_url('/auth/simplesaml/acs.php');
+        $a->slsurl = (string)new moodle_url('/auth/simplesaml/sls.php');
+        $authdescription = markdown_to_html(get_string("auth_simplesamldescription", "auth_simplesaml", $a));
+        return $authdescription;
+    }
+
     public function process_config($config) {
         $this->apply_config_defaults($config);
 
