@@ -117,6 +117,17 @@ LOGOUTREQUEST;
         return base64_encode($deflatedRequest);
     }
 
+    //JonoF
+    /**
+     * Returns the Logout Request without any encoding or compression applied.
+     *
+     * @return string unencoded Logout Request
+     */
+    public function getRawRequest()
+    {
+        return $this->_logoutRequest;
+    }
+
     /**
      * Returns the ID of the Logout Request.
      *

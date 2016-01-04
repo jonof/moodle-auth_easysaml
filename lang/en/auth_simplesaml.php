@@ -1,6 +1,8 @@
 <?php
 
 $string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin.';
+$string['bindingpost'] = 'POST';
+$string['bindingredirect'] = 'Redirect';
 $string['configencryption'] = 'Encryption and Signing';
 $string['configgeneral'] = 'General';
 $string['configidp'] = 'Identity Provider (IdP)';
@@ -22,12 +24,14 @@ $string['idp_name'] = 'Display name';
 $string['idp_name_desc'] = 'A user-friendly name for the Identity Provider for display on the login page.';
 $string['idp_ssourl'] = 'SSO URL';
 $string['idp_ssourl_desc'] = 'The URL of the Single Sign On service using "HTTP-Redirect" binding.';
+$string['idp_slobinding'] = 'SLO Binding';
 $string['idp_slourl'] = 'SLO URL';
 $string['idp_slourl_desc'] = 'The URL of the Single Log Out service using "HTTP-Redirect" binding.';
 $string['idp_cert'] = 'Certificate';
 $string['idp_cert_desc'] = 'The Base64-encoded X.509 certificate (DER or PEM format) that signs SAML IdP responses. You can provide this or the \'Certificate fingerprint\'.';
 $string['idp_certfingerprint'] = 'Certificate fingerprint';
 $string['idp_certfingerprint_desc'] = 'The <strong>SHA1</strong> fingerprint of the certificate that signs SAML IdP responses (formatted <code>XX:XX:XX:...:XX</code>). This is a simpler method for validating the signature if you don\'t wish to use the full certificate.';
+$string['logoutmessage'] = 'Your browser should redirect automatically to complete the logout operation. If it does not, please press the "Continue" button below.';
 $string['nomcryptnotice'] = 'The PHP mcrypt module is not enabled so many encryption and signing functions are not available.';
 $string['pluginname'] = 'Simplified SAML';
 $string['prefersso'] = 'Prefer SSO';
