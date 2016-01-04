@@ -140,6 +140,16 @@ global $OUTPUT;
         <td><input name="prefersso" id="prefersso" type="checkbox" value="1" <?php echo $config->prefersso ? 'checked' : '' ?>></td>
         <td class="desc"><?php echo get_string('prefersso_desc', 'auth_simplesaml', get_login_url() . '?nosso') ?></td>
     </tr>
+    <tr>
+        <td><label for="return_url"><?php echo get_string('return_url', 'auth_simplesaml') ?></label></td>
+        <td><input name="return_url" id="return_url" type="text" size="40" value="<?php echo s($config->return_url) ?>"></td>
+        <td class="desc"><?php echo get_string('return_url_desc', 'auth_simplesaml') ?></td>
+    </tr>
+    <tr>
+        <td><label for="change_password_url"><?php echo get_string('change_password_url', 'auth_simplesaml') ?></label></td>
+        <td><input name="change_password_url" id="change_password_url" type="text" size="40" value="<?php echo s($config->change_password_url) ?>"></td>
+        <td class="desc"><?php echo get_string('change_password_url_desc', 'auth_simplesaml') ?></td>
+    </tr>
 
     <?php print_auth_lock_options('simplesaml', $this->userfields, null, true, false); ?>
 </table>

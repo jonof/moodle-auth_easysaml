@@ -1,4 +1,5 @@
-#page-admin-auth-simplesaml table.configtable td {
+#page-admin-auth-simplesaml table.configtable label {
+    min-width: 12em;
 }
 #page-admin-auth-simplesaml table.configtable td {
     padding-bottom: 0.5em;

@@ -35,6 +35,11 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         $this->config = get_config(self::CONFIGNAME);
     }
 
+    /**
+     * Returns the singleton instance of the SAML2 auth object
+     * held by the helper.
+     * @return OneLogin_Saml2_Auth
+     */
     private function get_auth() {
         if (self::$auth === null) {
             $helper = new auth_simplesaml_helper();
@@ -85,6 +90,15 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         $frm->password = '';
     }
 
+    /**
+     * Handle a successful sign-on request from the SAML IdP.
+     *
+     * @param string $username The username (without system magic quotes)
+     * @param string $password The password (without system magic quotes)
+     *
+     * @return bool Authentication success or failure.
+     * @access public
+     */
     public function user_login($username, $password) {
         global $SESSION;
         if (empty($SESSION->auth_simplesaml_userinfo)) {
@@ -93,6 +107,18 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         return true;
     }
 
+    /**
+     * Read user information from the sources available to us.
+     *
+     * Called at login time by moodlelib.php:create_user_record
+     * and moodlelib.php:update_user_record, both via
+     * moodlelib.php:authenticate_user_login.
+     *
+     * @param string $username username
+     *
+     * @return mixed array with no magic quotes, or false on error
+     * @access public
+     */
     public function get_userinfo($username) {
         global $SESSION;
         if (empty($SESSION->auth_simplesaml_userinfo)) {
@@ -128,6 +154,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
 
             $PAGE->set_title(get_string('logout'));
             $PAGE->set_cacheable(false);
+            $PAGE->set_pagelayout('maintenance');
             $PAGE->requires->js_init_code('Y.one("#saml-logout").submit();');
 
             echo $OUTPUT->header();
@@ -162,7 +189,13 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         // Because login/logout.php won't get an opportunity to call this.
         require_logout();
 
-        $auth->logout($CFG->wwwroot . '/', array(), $nameid, $sessionindex);
+        if (empty($this->config->return_url)) {
+            $returnurl = $CFG->wwwroot . '/';
+        } else {
+            $returnurl = $this->config->return_url;
+        }
+
+        $auth->logout($returnurl, array(), $nameid, $sessionindex);
 
         throw new coding_exception("shouldn't have reached here");
     }
@@ -228,6 +261,12 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         if (!isset($config->wantsignedmessages)) {
             $config->wantsignedmessages = 0;
         }
+        if (!isset($config->return_url)) {
+            $config->return_url = '';
+        }
+        if (!isset($config->change_password_url)) {
+            $config->change_password_url = '';
+        }
     }
 
     public function config_form($config, $err, $user_fields) {
@@ -242,6 +281,25 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         $a->slsurl = (string)new moodle_url('/auth/simplesaml/sls.php');
         $authdescription = markdown_to_html(get_string("auth_simplesamldescription", "auth_simplesaml", $a));
         return $authdescription;
+    }
+
+    /**
+     * Determine whether to give the option to change password.
+     * @return bool
+     */
+    public function can_change_password() {
+        return !empty($this->config->change_password_url);
+    }
+
+    /**
+     * Returns the URL for changing the user's password.
+     * @return moodle_url url of the password change service, or null
+     */
+    public function change_password_url() {
+        if (!empty($this->config->change_password_url)) {
+            return new moodle_url($this->config->change_password_url);
+        }
+        return null;
     }
 
     public function process_config($config) {
@@ -267,6 +325,9 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         set_config('wantsignedasserts', $config->wantsignedasserts, self::CONFIGNAME);
         set_config('wantencryptednameid', $config->wantencryptednameid, self::CONFIGNAME);
         set_config('wantsignedmessages', $config->wantsignedmessages, self::CONFIGNAME);
+
+        set_config('return_url', $config->return_url, self::CONFIGNAME);
+        set_config('change_password_url', $config->change_password_url, self::CONFIGNAME);
 
         // Field mappings/locks/etc are saved by the caller.
 
