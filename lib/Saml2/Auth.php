@@ -66,6 +66,15 @@ class OneLogin_Saml2_Auth
      */
     private $_errorReason;
 
+    //BEGIN MOODLE
+    /**
+     * A callback that will emit an auto-submitted POST form for
+     * requests and responses.
+     * @var callable
+     */
+    private $_postCallback;
+    //END MOODLE
+
     /**
      * Initializes the SP SAML instance.
      *
@@ -159,8 +168,8 @@ class OneLogin_Saml2_Auth
                     }
                 }
             }
-        } else if (isset($_GET) && isset($_GET['SAMLRequest'])) {
-            $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_GET['SAMLRequest']);
+        } else if (isset($_REQUEST) && isset($_REQUEST['SAMLRequest'])) {   //MOODLE
+            $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, $_REQUEST['SAMLRequest']);  //MOODLE
             if (!$logoutRequest->isValid($retrieveParametersFromServer)) {
                 $this->_errors[] = 'invalid_logout_request';
                 $this->_errorReason = $logoutRequest->getError();
@@ -175,11 +184,25 @@ class OneLogin_Saml2_Auth
                 $inResponseTo = $logoutRequest->id;
                 $responseBuilder = new OneLogin_Saml2_LogoutResponse($this->_settings);
                 $responseBuilder->build($inResponseTo);
-                $logoutResponse = $responseBuilder->getResponse();
+
+                //BEGIN MOODLE
+                $responseUrl = $this->getSLOResponseUrl();
+                if (empty($responseUrl)) {
+                    $responseUrl = $this->getSLOurl();
+                }
+
+                if ($this->getSLObinding() === OneLogin_Saml2_Constants::BINDING_HTTP_POST) {
+                    $logoutResponse = $responseBuilder->getUncompressedResponse();
+                    $postredirect = true;
+                } else {
+                    $logoutResponse = $responseBuilder->getResponse();
+                    $postredirect = false;
+                }
+                //END MOODLE
 
                 $parameters = array('SAMLResponse' => $logoutResponse);
-                if (isset($_GET['RelayState'])) {
-                    $parameters['RelayState'] = $_GET['RelayState'];
+                if (isset($_REQUEST['RelayState'])) {   //MOODLE
+                    $parameters['RelayState'] = $_REQUEST['RelayState'];    //MOODLE
                 }
 
                 $security = $this->_settings->getSecurityData();
@@ -189,7 +212,7 @@ class OneLogin_Saml2_Auth
                     $parameters['Signature'] = $signature;
                 }
 
-                return $this->redirectTo($this->getSLOurl(), $parameters);
+                return $this->redirectTo($responseUrl, $parameters, $postredirect);   //MOODLE
             }
         } else {
             $this->_errors[] = 'invalid_binding';
@@ -206,8 +229,9 @@ class OneLogin_Saml2_Auth
      *
      * @param string $url        The target URL to redirect the user.
      * @param array  $parameters Extra parameters to be passed as part of the url
+     * @param boolean $post      Redirect by way of a form POST.    //MOODLE
      */
-    public function redirectTo($url = '', $parameters = array())
+    public function redirectTo($url = '', $parameters = array(), $post = false) //MOODLE
     {
         assert('is_string($url)');
         assert('is_array($parameters)');
@@ -215,6 +239,17 @@ class OneLogin_Saml2_Auth
         if (empty($url) && isset($_REQUEST['RelayState'])) {
             $url = $_REQUEST['RelayState'];
         }
+
+        //BEGIN MOODLE
+        if ($post) {
+            if ($this->_postCallback === null) {
+                OneLogin_Saml2_Utils::postRedirect($url, $parameters);
+            } else {
+                call_user_func($this->_postCallback, $url, $parameters);
+            }
+            exit;
+        }
+        //END MOODLE
 
         return OneLogin_Saml2_Utils::redirect($url, $parameters);
     }
@@ -307,6 +342,17 @@ class OneLogin_Saml2_Auth
         return $value;
     }
 
+    //BEGIN MOODLE
+    /**
+     * Sets the callback that should emit an auto-submit POST form.
+     *
+     * @param callable $callback receives the URL to post to and an array of the fields that should be sent
+     */
+    public function setPostCallback($callback) {
+        $this->_postCallback = $callback;
+    }
+    //END MOODLE
+
     /**
      * Initiates the SSO process.
      *
@@ -366,7 +412,15 @@ class OneLogin_Saml2_Auth
 
         $logoutRequest = new OneLogin_Saml2_LogoutRequest($this->_settings, null, $nameId, $sessionIndex);
 
-        $samlRequest = $logoutRequest->getRequest();
+        //BEGIN MOODLE
+        if ($this->getSLObinding() === OneLogin_Saml2_Constants::BINDING_HTTP_POST) {
+            $samlRequest = $logoutRequest->getUncompressedRequest();
+            $postredirect = true;
+        } else {
+            $samlRequest = $logoutRequest->getRequest();
+            $postredirect = false;
+        }
+        //END MOODLE
 
         $parameters['SAMLRequest'] = $samlRequest;
         if (!empty($returnTo)) {
@@ -382,7 +436,7 @@ class OneLogin_Saml2_Auth
             $parameters['Signature'] = $signature;
         }
 
-        return $this->redirectTo($sloUrl, $parameters);
+        return $this->redirectTo($sloUrl, $parameters, $postredirect);  //MOODLE
     }
 
     /**
@@ -399,7 +453,7 @@ class OneLogin_Saml2_Auth
     /**
      * Gets the SLO url.
      *
-     * @return string The url of the Single Logout Service
+     * @return string The url of the Single Logout Service request
      */
     public function getSLOurl()
     {
@@ -410,6 +464,38 @@ class OneLogin_Saml2_Auth
         }
         return $url;
     }
+
+    //BEGIN MOODLE
+    /**
+     * Gets the SLO response url.
+     *
+     * @return string The url of the Single Logout Service response
+     */
+    public function getSLOResponseUrl()
+    {
+        $url = null;
+        $idpData = $this->_settings->getIdPData();
+        if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['responseUrl'])) {
+            $url = $idpData['singleLogoutService']['responseUrl'];
+        }
+        return $url;
+    }
+
+    /**
+     * Gets the SLO binding.
+     *
+     * @return string A OneLogin_Saml2_Constants binding value
+     */
+    public function getSLObinding()
+    {
+        $binding = null;
+        $idpData = $this->_settings->getIdPData();
+        if (isset($idpData['singleLogoutService']) && isset($idpData['singleLogoutService']['binding'])) {
+            $binding = $idpData['singleLogoutService']['binding'];
+        }
+        return $binding;
+    }
+    //END MOODLE
 
     /**
      * Generates the Signature for a SAML Request

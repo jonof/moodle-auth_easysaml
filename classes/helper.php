@@ -104,7 +104,7 @@ class auth_simplesaml_helper {
 
         $settings = array(
             'strict' => true,
-            'debug' => false,
+            'debug' => debugging('', DEBUG_ALL),
 
             // Define ourselves.
             'sp' => array(
@@ -115,7 +115,7 @@ class auth_simplesaml_helper {
                 'singleLogoutService' => array(
                     'url' => $CFG->wwwroot . '/auth/simplesaml/sls.php',
                 ),
-                'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+                'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
             ),
 
             // Define our identity provider.
@@ -133,6 +133,10 @@ class auth_simplesaml_helper {
         if (!empty($config->idp_slourl)) {
             $settings['idp']['singleLogoutService'] = array(
                 'url' => $config->idp_slourl,
+                'responseUrl' => $config->idp_sloresponseurl,
+                'binding' => $config->idp_slobinding === 'post' ?
+                    OneLogin_Saml2_Constants::BINDING_HTTP_POST :
+                    OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
             );
         }
 
@@ -169,7 +173,9 @@ class auth_simplesaml_helper {
             $settings['idp']['certFingerprint'] = $config->idp_certfingerprint;
         }
 
-        return new OneLogin_Saml2_Auth($settings);
+        $auth = new OneLogin_Saml2_Auth($settings);
+        $auth->setPostCallback(array(__CLASS__, 'post_callback'));
+        return $auth;
     }
 
     public function get_metadata() {
@@ -232,5 +238,39 @@ class auth_simplesaml_helper {
 
     public static function logout_callback() {
         require_logout();
+    }
+
+    public static function post_callback($action, array $parameters) {
+        global $PAGE, $OUTPUT;
+
+        $PAGE->set_title(get_string('logout'));
+        $PAGE->set_cacheable(false);
+        $PAGE->set_pagelayout('maintenance');
+        $PAGE->requires->js_init_code('Y.one("#saml-logout").submit();');
+
+        echo $OUTPUT->header();
+        echo $OUTPUT->heading(get_string('logout'));
+
+        $formattrs = array(
+            'method' => 'POST',
+            'action' => $action,
+            'id' => 'saml-logout',
+        );
+        echo html_writer::start_tag('form', $formattrs);
+
+        echo $OUTPUT->box_start('generalbox', 'notice');
+        echo html_writer::tag('p', get_string('logoutmessage', 'auth_simplesaml'));
+
+        echo html_writer::div(html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('continue'))), 'buttons');
+
+        foreach ($parameters as $name => $value) {
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $name, 'value' => $value));
+        }
+        echo $OUTPUT->box_end();
+
+        echo html_writer::end_tag('form');
+
+        echo $OUTPUT->footer();
+        exit;
     }
 }

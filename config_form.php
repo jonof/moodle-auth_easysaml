@@ -44,6 +44,11 @@ global $OUTPUT;
         <td class="desc"><?php echo get_string('idp_slourl_desc', 'auth_simplesaml') ?></td>
     </tr>
     <tr>
+        <td><label for="idp_sloresponseurl"><?php echo get_string('idp_sloresponseurl', 'auth_simplesaml') ?></label></td>
+        <td><input name="idp_sloresponseurl" id="idp_sloresponseurl" type="text" size="40" value="<?php echo s($config->idp_sloresponseurl) ?>"></td>
+        <td class="desc"><?php echo get_string('idp_sloresponseurl_desc', 'auth_simplesaml') ?></td>
+    </tr>
+    <tr>
         <td><label for="idp_slobinding"><?php echo get_string('idp_slobinding', 'auth_simplesaml') ?></label></td>
         <td><?php
             $options = array(

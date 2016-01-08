@@ -119,16 +119,17 @@ LOGOUTREQUEST;
         return base64_encode($deflatedRequest);
     }
 
-    //JonoF
+    //BEGIN MOODLE
     /**
-     * Returns the Logout Request without any encoding or compression applied.
+     * Returns the Logout Request without any compression applied.
      *
-     * @return string unencoded Logout Request
+     * @return string base64 encoded Logout Request
      */
-    public function getRawRequest()
+    public function getUncompressedRequest()
     {
-        return $this->_logoutRequest;
+        return base64_encode($this->_logoutRequest);
     }
+    //END MOODLE
 
     /**
      * Returns the ID of the Logout Request.

@@ -434,6 +434,16 @@ class OneLogin_Saml2_Settings
                 $errors[] = 'idp_slo_url_invalid';
             }
 
+            //BEGIN MOODLE
+            if (isset($idp['singleLogoutService'])
+                && isset($idp['singleLogoutService']['responseUrl'])
+                && !empty($idp['singleLogoutService']['responseUrl'])
+                && !filter_var($idp['singleLogoutService']['responseUrl'], FILTER_VALIDATE_URL)
+            ) {
+                $errors[] = 'idp_slo_response_url_invalid';
+            }
+            //END MOODLE
+
             if (isset($settings['security'])) {
                 $security = $settings['security'];
 

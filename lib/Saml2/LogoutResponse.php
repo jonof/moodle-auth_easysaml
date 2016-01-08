@@ -221,6 +221,13 @@ class OneLogin_Saml2_LogoutResponse
 
         $id = OneLogin_Saml2_Utils::generateUniqueID();
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
+        //BEGIN MOODLE
+        if (!empty($idpData['singleLogoutService']['responseUrl'])) {
+            $url = $idpData['singleLogoutService']['responseUrl'];
+        } else {
+            $url = $idpData['singleLogoutService']['url'];
+        }
+        //END MOODLE
 
         $logoutResponse = <<<LOGOUTRESPONSE
 <samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -228,7 +235,7 @@ class OneLogin_Saml2_LogoutResponse
                   ID="{$id}"
                   Version="2.0"
                   IssueInstant="{$issueInstant}"
-                  Destination="{$idpData['singleLogoutService']['url']}"
+                  Destination="{$url}"
                   InResponseTo="{$inResponseTo}"
                   >
     <saml:Issuer>{$spData['entityId']}</saml:Issuer>
@@ -250,6 +257,18 @@ LOGOUTRESPONSE;
         $deflatedResponse = gzdeflate($this->_logoutResponse);
         return base64_encode($deflatedResponse);
     }
+
+    //BEGIN MOODLE
+    /**
+     * Returns the Logout Response without any compression applied.
+     *
+     * @return string base64 encoded Logout Response
+     */
+    public function getUncompressedResponse()
+    {
+        return base64_encode($this->_logoutResponse);
+    }
+    //END MOODLE
 
     /* After execute a validation process, if fails this method returns the cause.
      *
