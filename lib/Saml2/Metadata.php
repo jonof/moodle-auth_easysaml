@@ -32,7 +32,7 @@ class OneLogin_Saml2_Metadata
         $validUntilTime =  gmdate('Y-m-d\TH:i:s\Z', $validUntil);
 
         if (!isset($cacheDuration)) {
-            $cacheDuration = time() + self::TIME_CACHED;
+            $cacheDuration = self::TIME_CACHED;
         }
 
         $sls = '';
@@ -59,18 +59,27 @@ SLS_TEMPLATE;
 
         $strOrganization = '';
         if (!empty($organization)) {
-            $organizationInfo = array();
+            $organizationInfoNames = array();
+            $organizationInfoDisplaynames = array();
+            $organizationInfoUrls = array();
             foreach ($organization as $lang => $info) {
-                $organizationInfo[] = <<<ORGANIZATION
+                $organizationInfoNames[] = <<<ORGANIZATION_NAME
+       <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
+ORGANIZATION_NAME;
+                $organizationInfoDisplaynames[] = <<<ORGANIZATION_DISPLAY
+       <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
+ORGANIZATION_DISPLAY;
+                $organizationInfoUrls[] = <<<ORGANIZATION_URL
+       <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
+ORGANIZATION_URL;
+            }
+            $orgData = implode("\n", $organizationInfoNames)."\n".implode("\n", $organizationInfoDisplaynames)."\n".implode("\n", $organizationInfoUrls);
+            $strOrganization = <<<ORGANIZATIONSTR
 
     <md:Organization>
-       <md:OrganizationName xml:lang="{$lang}">{$info['name']}</md:OrganizationName>
-       <md:OrganizationDisplayName xml:lang="{$lang}">{$info['displayname']}</md:OrganizationDisplayName>
-       <md:OrganizationURL xml:lang="{$lang}">{$info['url']}</md:OrganizationURL>
+{$orgData}
     </md:Organization>
-ORGANIZATION;
-            }
-            $strOrganization = implode("\n", $organizationInfo);
+ORGANIZATIONSTR;
         }
 
         $strContacts = '';
@@ -113,9 +122,9 @@ METADATA_TEMPLATE;
      *
      * @return string Signed Metadata
      */
-    public static function signMetadata($metadata, $key, $cert)
+    public static function signMetadata($metadata, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
-        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert);
+        return OneLogin_Saml2_Utils::addSign($metadata, $key, $cert, $signAlgorithm);
     }
 
     /**

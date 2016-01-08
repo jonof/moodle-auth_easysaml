@@ -222,11 +222,15 @@ class auth_simplesaml_helper {
     public function handle_slo() {
         $auth = $this->get_auth();
 
-        $auth->processSLO();
+        $auth->processSLO(false, null, false, array(__CLASS__, 'logout_callback'));
         $errors = $auth->getErrors();
         if (!empty($errors)) {
             debugging('auth_simplesaml slo errors: ' . implode(', ', $errors) .
                 ' (' . $auth->getLastErrorReason() . ')', DEBUG_NORMAL);
         }
+    }
+
+    public static function logout_callback() {
+        require_logout();
     }
 }

@@ -169,10 +169,11 @@ class OneLogin_Saml2_Response
 
                 // Check destination
                 if ($this->document->documentElement->hasAttribute('Destination')) {
-                    $destination = $this->document->documentElement->getAttribute('Destination');
+                    $destination = trim($this->document->documentElement->getAttribute('Destination'));
                     if (!empty($destination)) {
                         if (strpos($destination, $currentURL) !== 0) {
                             $currentURLrouted = OneLogin_Saml2_Utils::getSelfRoutedURLNoQuery();
+
                             if (strpos($destination, $currentURLrouted) !== 0) {
                                 throw new Exception("The response was received at $currentURL instead of $destination");
                             }
@@ -189,7 +190,9 @@ class OneLogin_Saml2_Response
                 // Check the issuers
                 $issuers = $this->getIssuers();
                 foreach ($issuers as $issuer) {
-                    if (empty($issuer) || $issuer != $idPEntityId) {
+                    $trimmedIssuer = trim($issuer);
+
+                    if (empty($trimmedIssuer) || $trimmedIssuer !== $idPEntityId) {
                         throw new Exception("Invalid issuer in the Assertion/Response");
                     }
                 }
@@ -257,6 +260,7 @@ class OneLogin_Saml2_Response
             if (!empty($signedElements)) {
                 $cert = $idpData['x509cert'];
                 $fingerprint = $idpData['certFingerprint'];
+                $fingerprintalg = $idpData['certFingerprintAlgorithm'];
 
                 // Only validates the first signed element
                 if (in_array('Response', $signedElements)) {
@@ -271,7 +275,7 @@ class OneLogin_Saml2_Response
                     }
                 }
 
-                if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint)) {
+                if (!OneLogin_Saml2_Utils::validateSign($documentToValidate, $cert, $fingerprint, $fingerprintalg)) {
                     throw new Exception('Signature validation failed. SAML Response rejected');
                 }
             } else {
@@ -547,7 +551,7 @@ class OneLogin_Saml2_Response
      * @throws Exception
      * @return DOMNodeList The queried node
      */
-    private function _queryAssertion($assertionXpath)
+    protected function _queryAssertion($assertionXpath)
     {
         if ($this->encrypted) {
             $xpath = new DOMXPath($this->decryptedDocument);
@@ -602,7 +606,7 @@ class OneLogin_Saml2_Response
      * @throws Exception
      * @return DOMDocument Decrypted Assertion
      */
-    private function _decryptAssertion($dom)
+    protected function _decryptAssertion($dom)
     {
         $pem = $this->_settings->getSPkey();
 

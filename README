@@ -22,10 +22,6 @@ is available from https://github.com/onelogin/php-saml.
 The lib and extlib directories of that library are used in
 this plugin.
 
-Adjustments were made in Saml2/Auth.php processSLO() to call
-Moodle's session logout function instead of destroying the
-PHP session directly.
-
 This plugin was developed using simpleSAMLphp as IdP and has
 had (to date) limited use with F5 APM as IdP.
 

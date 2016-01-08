@@ -634,7 +634,7 @@ class OneLogin_Saml2_Utils
      *
      * @return string Formated fingerprint
      */
-    public static function calculateX509Fingerprint($x509cert)
+    public static function calculateX509Fingerprint($x509cert, $alg='sha1')
     {
         assert('is_string($x509cert)');
 
@@ -659,11 +659,20 @@ class OneLogin_Saml2_Utils
                 $data .= $line;
             }
         }
+        $decodedData = base64_decode($data);
 
-        /* $data now contains the certificate as a base64-encoded string. The fingerprint
-         * of the certificate is the sha1-hash of the certificate.
-         */
-        return strtolower(sha1(base64_decode($data)));
+        switch ($alg) {
+            case 'sha512':
+            case 'sha384':
+            case 'sha256':
+                $fingerprint = hash($alg, $decodedData, FALSE);
+                break;
+            case 'sha1':
+            default:
+                $fingerprint = strtolower(sha1($decodedData));
+                break;
+        }
+        return $fingerprint;
     }
 
     /**
@@ -696,7 +705,9 @@ class OneLogin_Saml2_Utils
         $doc = new DOMDocument();
 
         $nameId = $doc->createElement('saml:NameID');
-        $nameId->setAttribute('SPNameQualifier', $spnq);
+        if (isset($spnq)) {
+            $nameId->setAttribute('SPNameQualifier', $spnq);
+        }
         $nameId->setAttribute('Format', $format);
         $nameId->appendChild($doc->createTextNode($value));
 
@@ -899,11 +910,12 @@ class OneLogin_Saml2_Utils
     /**
      * Adds signature key and senders certificate to an element (Message or Assertion).
      *
-     * @param string|DomDocument $xml  The element we should sign
-     * @param string             $key  The private key
-     * @param string             $cert The public
+     * @param string|DomDocument $xml            The element we should sign
+     * @param string             $key            The private key
+     * @param string             $cert           The public
+     * @param string             $signAlgorithm Signature algorithm method
      */
-    public static function addSign($xml, $key, $cert)
+    public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
         if ($xml instanceof DOMDocument) {
             $dom = $xml;
@@ -916,7 +928,7 @@ class OneLogin_Saml2_Utils
         }
 
         /* Load the private key. */
-        $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'private'));
+        $objKey = new XMLSecurityKey($signAlgorithm, array('type' => 'private'));
         $objKey->loadKey($key, false);
 
         /* Get the EntityDescriptor node we should sign. */
@@ -962,11 +974,12 @@ class OneLogin_Saml2_Utils
     /**
      * Validates a signature (Message or Assertion).
      *
-     * @param string|DomDocument $xml         The element we should validate
-     * @param string|null        $cert        The pubic cert
-     * @param string|null        $fingerprint The fingerprint of the public cert
+     * @param string|DomDocument $xml            The element we should validate
+     * @param string|null        $cert           The pubic cert
+     * @param string|null        $fingerprint    The fingerprint of the public cert
+     * @param string|null        $fingerprintalg The algorithm used to get the fingerprint
      */
-    public static function validateSign ($xml, $cert = null, $fingerprint = null)
+    public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
@@ -975,6 +988,22 @@ class OneLogin_Saml2_Utils
         } else {
             $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
+        }
+
+        # Check if Reference URI is empty
+        try {
+            $signatureElems = $dom->getElementsByTagName('Signature');
+            foreach ($signatureElems as $signatureElem) {
+                $referenceElems = $dom->getElementsByTagName('Reference');
+                if (count($referenceElems) > 0) {
+                    $referenceElem = $referenceElems->item(0);
+                    if ($referenceElem->getAttribute('URI') == '') {
+                        $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            //It's ok, let's continue;
         }
 
         $objXMLSecDSig = new XMLSecurityDSig();
@@ -1005,7 +1034,7 @@ class OneLogin_Saml2_Utils
             return ($objXMLSecDSig->verify($objKey) === 1);
         } else {
             $domCert = $objKey->getX509Certificate();
-            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert);
+            $domCertFingerprint = OneLogin_Saml2_Utils::calculateX509Fingerprint($domCert, $fingerprintalg);
             if (OneLogin_Saml2_Utils::formatFingerPrint($fingerprint) !== $domCertFingerprint) {
                 return false;
             } else {
