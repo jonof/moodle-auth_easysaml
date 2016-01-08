@@ -21,6 +21,7 @@ $string['encryptionconfignote'] = 'These settings define the signing and encrypt
 <li><em>Sign</em> and <em>Require encrypted</em> options require the SP certificate and private key be configured.</li>
 <li><em>Require signed</em> options require the IdP certificate or fingerprint be configured.</li>
 <li><em>Encrypt the name ID</em> requires the IdP certificate be configured. (The fingerprint is not enough.)</li>
+<li><em>Sign logout requests</em> and <em>Sign logout responses</em> are not supported when "SLO Binding" is set to <em>POST</em>.</li>
 </ul>
 ';
 $string['encryptnameid'] = 'Encrypt the name ID';

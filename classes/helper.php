@@ -155,11 +155,12 @@ class auth_simplesaml_helper {
                 $settings['sp']['privateKey'] = $config->sp_privatekey;
             }
 
+            $slopost = $config->idp_slobinding === 'post';
             $settings['security']['signMetadata'] = !empty($config->signmetadata);
             $settings['security']['nameIdEncrypted'] = !empty($config->encryptnameid);
             $settings['security']['authnRequestsSigned'] = !empty($config->signauthrequests);
-            $settings['security']['logoutRequestSigned'] = !empty($config->signlogoutrequests);
-            $settings['security']['logoutResponseSigned'] = !empty($config->signlogoutresponses);
+            $settings['security']['logoutRequestSigned'] = !empty($config->signlogoutrequests) && !$slopost;
+            $settings['security']['logoutResponseSigned'] = !empty($config->signlogoutresponses) && !$slopost;
             $settings['security']['wantAssertionsEncrypted'] = !empty($config->wantencryptedasserts);
             $settings['security']['wantNameIdEncrypted'] = !empty($config->wantencryptednameid);
         }
