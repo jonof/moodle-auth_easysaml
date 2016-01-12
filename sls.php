@@ -28,4 +28,8 @@ require_once '../../config.php';
 $helper = new auth_simplesaml_helper();
 $helper->handle_slo();
 
-redirect($CFG->wwwroot . '/');
+$returnurl = get_config('auth/simplesaml', 'return_url');
+if (empty($returnurl)) {
+    $returnurl = $CFG->wwwroot . '/';
+}
+redirect($returnurl);
