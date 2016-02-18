@@ -102,18 +102,23 @@ class auth_simplesaml_helper {
         }
         $config = get_config(self::CONFIGNAME);
 
+        $wwwroot = $CFG->httpswwwroot;
+        if (!empty($CFG->loginhttps)) {
+            $wwwroot = str_replace('http:', 'https:', $wwwroot);
+        }
+
         $settings = array(
             'strict' => true,
             'debug' => debugging('', DEBUG_ALL),
 
             // Define ourselves.
             'sp' => array(
-                'entityId' => $CFG->wwwroot . '/auth/simplesaml/metadata.php',
+                'entityId' => $wwwroot . '/auth/simplesaml/metadata.php',
                 'assertionConsumerService' => array(
-                    'url' => $CFG->wwwroot . '/auth/simplesaml/acs.php',
+                    'url' => $wwwroot . '/auth/simplesaml/acs.php',
                 ),
                 'singleLogoutService' => array(
-                    'url' => $CFG->wwwroot . '/auth/simplesaml/sls.php',
+                    'url' => $wwwroot . '/auth/simplesaml/sls.php',
                 ),
                 'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
             ),

@@ -246,10 +246,17 @@ class auth_plugin_simplesaml extends auth_plugin_base {
     }
 
     public function get_description() {
-        $a = new stdClass();
-        $a->metadataurl = (string)new moodle_url('/auth/simplesaml/metadata.php');
-        $a->acsurl = (string)new moodle_url('/auth/simplesaml/acs.php');
-        $a->slsurl = (string)new moodle_url('/auth/simplesaml/sls.php');
+        global $CFG;
+
+        $a = array(
+            'metadataurl' => (string)new moodle_url('/auth/simplesaml/metadata.php'),
+            'acsurl' => (string)new moodle_url('/auth/simplesaml/acs.php'),
+            'slsurl' => (string)new moodle_url('/auth/simplesaml/sls.php'),
+        );
+        if (!empty($CFG->loginhttps)) {
+            $a = str_replace('http:', 'https:', $a);
+        }
+
         $authdescription = markdown_to_html(get_string("auth_simplesamldescription", "auth_simplesaml", $a));
         return $authdescription;
     }
