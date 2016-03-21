@@ -25,6 +25,8 @@
 define('NO_DEBUG_DISPLAY', true);
 require_once '../../config.php';
 
+$PAGE->https_required();
+
 $helper = new auth_simplesaml_helper();
 if (!$helper->handle_acs()) {
     throw new moodle_exception('errornotauthenticated', 'auth_simplesaml');

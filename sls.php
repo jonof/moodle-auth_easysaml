@@ -25,6 +25,8 @@
 define('NO_DEBUG_DISPLAY', true);
 require_once '../../config.php';
 
+$PAGE->https_required();
+
 $helper = new auth_simplesaml_helper();
 $helper->handle_slo();
 

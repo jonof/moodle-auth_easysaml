@@ -103,9 +103,6 @@ class auth_simplesaml_helper {
         $config = get_config(self::CONFIGNAME);
 
         $wwwroot = $CFG->httpswwwroot;
-        if (!empty($CFG->loginhttps)) {
-            $wwwroot = str_replace('http:', 'https:', $wwwroot);
-        }
 
         $settings = array(
             'strict' => true,
