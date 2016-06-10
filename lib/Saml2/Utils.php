@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * Utils of OneLogin PHP Toolkit
  *
@@ -9,11 +9,11 @@
 class OneLogin_Saml2_Utils
 {
     /**
-    * Translates any string. Accepts args  
+    * Translates any string. Accepts args
     *
     * @param string $msg  Message to be translated
-    * @param array  $args Arguments
-    * 
+    * @param array|null $args Arguments
+    *
     * @return string $translatedMsg  Translated text
     */
     public static function t($msg, $args = array())
@@ -41,7 +41,7 @@ class OneLogin_Saml2_Utils
      * @param DOMDocument $dom The document where load the xml.
      * @param string      $xml The XML string to be loaded.
      *
-     * @throws DOMExceptions
+     * @throws Exception
      *
      * @return DOMDocument $dom The result of load the XML at the DomDocument
      */
@@ -70,11 +70,11 @@ class OneLogin_Saml2_Utils
      *
      * It will parse the string into a DOM document and validate this document against the schema.
      *
-     * @param string  $xml    The XML string or document which should be validated.
-     * @param string  $schema The schema filename which should be used.
-     * @param boolean $debug  To disable/enable the debug mode
+     * @param string|DOMDocument $xml    The XML string or document which should be validated.
+     * @param string             $schema The schema filename which should be used.
+     * @param bool               $debug  To disable/enable the debug mode
      *
-     * @return string | DOMDocument $dom  string that explains the problem or the DOMDocument
+     * @return string|DOMDocument $dom  string that explains the problem or the DOMDocument
      */
     public static function validateXML($xml, $schema, $debug = false)
     {
@@ -120,7 +120,7 @@ class OneLogin_Saml2_Utils
      * Returns a x509 cert (adding header & footer if required).
      *
      * @param string  $cert  A x509 unformated cert
-     * @param boolean $heads True if we want to include head and footer
+     * @param bool    $heads True if we want to include head and footer
      *
      * @return string $x509 Formated cert
      */
@@ -145,7 +145,7 @@ class OneLogin_Saml2_Utils
      * Returns a private key (adding header & footer if required).
      *
      * @param string  $key   A private key
-     * @param boolean $heads True if we want to include head and footer
+     * @param bool    $heads True if we want to include head and footer
      *
      * @return string $rsaKey Formated private key
      */
@@ -156,16 +156,20 @@ class OneLogin_Saml2_Utils
         if (!empty($key)) {
 
             if (strpos($key, '-----BEGIN PRIVATE KEY-----') !== false) {
-                $key = str_replace('-----BEGIN PRIVATE KEY-----', "", $key);
-                $key = str_replace('-----END PRIVATE KEY-----', "", $key);
+                $key = OneLogin_Saml2_Utils::get_string_between($key, '-----BEGIN PRIVATE KEY-----', '-----END PRIVATE KEY-----');
                 $key = str_replace(' ', '', $key);
 
                 if ($heads) {
                     $key = "-----BEGIN PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END PRIVATE KEY-----\n";
                 }
+            } else if (strpos($key, '-----BEGIN RSA PRIVATE KEY-----') !== false) {
+                $key = OneLogin_Saml2_Utils::get_string_between($key, '-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----');
+                $key = str_replace(' ', '', $key);
+
+                if ($heads) {
+                    $key = "-----BEGIN RSA PRIVATE KEY-----\n".chunk_split($key, 64, "\n")."-----END RSA PRIVATE KEY-----\n";
+                }
             } else {
-                $key = str_replace('-----BEGIN RSA PRIVATE KEY-----', "", $key);
-                $key = str_replace('-----END RSA PRIVATE KEY-----', "", $key);
                 $key = str_replace(' ', '', $key);
 
                 if ($heads) {
@@ -177,13 +181,39 @@ class OneLogin_Saml2_Utils
     }
 
     /**
+     * Extracts a substring between 2 marks
+     *
+     * @param string  $str      The target string
+     * @param string  $start    The initial mark
+     * @param string  $end      The end mark
+     *
+     * @return string A substring or an empty string if is not able to find the marks
+     *                or if there is no string between the marks
+     */
+    public static function get_string_between($str, $start, $end)
+    {
+        $str = ' ' . $str;
+        $ini = strpos($str, $start);
+
+        if ($ini == 0) {
+            return '';
+        }
+
+        $ini += strlen($start);
+        $len = strpos($str, $end, $ini) - $ini;
+        return substr($str, $ini, $len);
+    }
+
+    /**
      * Executes a redirection to the provided url (or return the target url).
      *
-     * @param string  $url        The target url
-     * @param array   $parameters Extra parameters to be passed as part of the url
-     * @param boolean $stay       True if we want to stay (returns the url string) False to redirect
+     * @param string       $url        The target url
+     * @param array        $parameters Extra parameters to be passed as part of the url
+     * @param bool         $stay       True if we want to stay (returns the url string) False to redirect
      *
-     * @return string $url
+     * @return string|null $url
+     *
+     * @throws OneLogin_Saml2_Error
      */
     public static function redirect($url, $parameters = array(), $stay = false)
     {
@@ -202,7 +232,7 @@ class OneLogin_Saml2_Utils
             );
         }
 
-        
+
         /* Add encoded parameters */
         if (strpos($url, '?') === false) {
             $paramPrefix = '?';
@@ -248,9 +278,17 @@ class OneLogin_Saml2_Utils
      *
      * @param string  $url        The target url
      * @param array   $parameters Extra parameters to be passed as part of the url
+     * @param bool    $stay       True if we want to stay (returns an array of action and parameters) False to redirect
      */
-    public static function postRedirect($url, $parameters = array())
+    public static function postRedirect($url, $parameters = array(), $stay = false)
     {
+        if ($stay) {
+            return array(
+                'action' => $url,
+                'parameters' => $parameters,
+            );
+        }
+
         header('Pragma: no-cache');
         header('Cache-Control: no-cache, must-revalidate');
 
@@ -348,7 +386,7 @@ EOT;
     /**
      * Checks if https or http.
      *
-     * @return boolean $isHttps  False if https is not active
+     * @return bool $isHttps False if https is not active
      */
     public static function isHTTPS()
     {
@@ -419,10 +457,12 @@ EOT;
         return $selfURLhost . $requestURI;
     }
 
-     /**
+    /**
      * Extract a query param - as it was sent - from $_SERVER[QUERY_STRING]
      *
-     * @param string The param to-be extracted
+     * @param string $name The param to-be extracted
+     *
+     * @return string
      */
     public static function extractOriginalQueryParam ($name)
     {
@@ -448,7 +488,7 @@ EOT;
      *
      * @param string $time The time we should convert (DateTime).
      *
-     * @return $timestamp SAML2 timestamp.
+     * @return string $timestamp SAML2 timestamp.
      */
     public static function parseTime2SAML($time)
     {
@@ -465,7 +505,9 @@ EOT;
      *
      * @param string $time The time we should convert (SAML Timestamp).
      *
-     * @return $timestamp  Converted to a unix timestamp.
+     * @return int $timestamp  Converted to a unix timestamp.
+     *
+     * @throws Exception
      */
     public static function parseSAML2Time($time)
     {
@@ -504,12 +546,14 @@ EOT;
     /**
      * Interprets a ISO8601 duration value relative to a given timestamp.
      *
-     * @param string $duration  The duration, as a string.
-     * @param int    $timestamp The unix timestamp we should apply the
-     *                          duration to. Optional, default to the
-     *                          current time.
+     * @param string   $duration  The duration, as a string.
+     * @param int|null $timestamp The unix timestamp we should apply the
+     *                            duration to. Optional, default to the
+     *                            current time.
      *
-     * @return int The new timestamp, after the duration is applied.
+     * @return int|null The new timestamp, after the duration is applied.
+     *
+     * @throws Exception
      */
     public static function parseDuration($duration, $timestamp = null)
     {
@@ -622,7 +666,7 @@ EOT;
      *
      * @param DOMDocument $dom     The DOMDocument
      * @param string      $query   Xpath Expresion
-     * @param DomElement  $context Context Node (DomElement) 
+     * @param DomElement  $context Context Node (DomElement)
      *
      * @return DOMNodeList The queried nodes
      */
@@ -645,7 +689,7 @@ EOT;
     /**
      * Checks if the session is started or not.
      *
-     * @return boolean true if the sessíon is started
+     * @return bool true if the sessíon is started
      */
     public static function isSessionStarted()
     {
@@ -674,7 +718,7 @@ EOT;
      *
      * @param string $x509cert x509 cert
      *
-     * @return string Formated fingerprint
+     * @return null|string Formated fingerprint
      */
     public static function calculateX509Fingerprint($x509cert, $alg='sha1')
     {
@@ -734,10 +778,10 @@ EOT;
     /**
      * Generates a nameID.
      *
-     * @param string $value  fingerprint
-     * @param string $spnq   SP Name Qualifier
-     * @param string $format SP Format
-     * @param string $cert   IdP Public cert to encrypt the nameID
+     * @param string      $value  fingerprint
+     * @param string      $spnq   SP Name Qualifier
+     * @param string      $format SP Format
+     * @param string|null $cert   IdP Public cert to encrypt the nameID
      *
      * @return string $nameIDElement DOMElement | XMLSec nameID
      */
@@ -787,9 +831,11 @@ EOT;
     /**
      * Gets Status from a Response.
      *
-     * @param DomElement $dom The Response as XML
+     * @param DOMDocument $dom The Response as XML
      *
      * @return array $status The Status, an array with the code and a message.
+     *
+     * @throws Exception
      */
     public static function getStatus($dom)
     {
@@ -830,6 +876,8 @@ EOT;
      * @param XMLSecurityKey $inputKey      The decryption key.
      *
      * @return DOMElement  The decrypted element.
+     *
+     * @throws Exception
      */
     public static function decryptElement(DOMElement $encryptedData, XMLSecurityKey $inputKey)
     {
@@ -849,9 +897,9 @@ EOT;
             throw new Exception('Could not locate <dsig:KeyInfo> for the encrypted key.');
         }
 
-        $inputKeyAlgo = $inputKey->getAlgorith();
+        $inputKeyAlgo = $inputKey->getAlgorithm();
         if ($symmetricKeyInfo->isEncrypted) {
-            $symKeyInfoAlgo = $symmetricKeyInfo->getAlgorith();
+            $symKeyInfoAlgo = $symmetricKeyInfo->getAlgorithm();
 
             if ($symKeyInfoAlgo === XMLSecurityKey::RSA_OAEP_MGF1P && $inputKeyAlgo === XMLSecurityKey::RSA_1_5) {
                 $inputKeyAlgo = XMLSecurityKey::RSA_OAEP_MGF1P;
@@ -890,7 +938,7 @@ EOT;
             }
             $symmetricKey->loadkey($key);
         } else {
-            $symKeyAlgo = $symmetricKey->getAlgorith();
+            $symKeyAlgo = $symmetricKey->getAlgorithm();
             if ($inputKeyAlgo !== $symKeyAlgo) {
                 throw new Exception(
                     'Algorithm mismatch between input key and key in message. ' .
@@ -911,7 +959,7 @@ EOT;
         if (!$newDoc) {
             throw new Exception('Failed to parse decrypted XML.');
         }
- 
+
         $decryptedElement = $newDoc->firstChild->firstChild;
         if ($decryptedElement === null) {
             throw new Exception('Missing encrypted element.');
@@ -921,14 +969,16 @@ EOT;
     }
 
      /**
-    * Converts a XMLSecurityKey to the correct algorithm.
-    *
-    * @param XMLSecurityKey $key The key.
-    * @param string $algorithm The desired algorithm.
-    * @param string $type Public or private key, defaults to public.
-    * @return XMLSecurityKey The new key.
-    * @throws Exception
-    */
+      * Converts a XMLSecurityKey to the correct algorithm.
+      *
+      * @param XMLSecurityKey $key The key.
+      * @param string $algorithm The desired algorithm.
+      * @param string $type Public or private key, defaults to public.
+      *
+      * @return XMLSecurityKey The new key.
+      *
+      * @throws Exception
+      */
     public static function castKey(XMLSecurityKey $key, $algorithm, $type = 'public')
     {
         assert('is_string($algorithm)');
@@ -952,10 +1002,14 @@ EOT;
     /**
      * Adds signature key and senders certificate to an element (Message or Assertion).
      *
-     * @param string|DomDocument $xml            The element we should sign
-     * @param string             $key            The private key
-     * @param string             $cert           The public
+     * @param string|DomDocument $xml           The element we should sign
+     * @param string             $key           The private key
+     * @param string             $cert          The public
      * @param string             $signAlgorithm Signature algorithm method
+     *
+     * @return string
+     *
+     * @throws Exception
      */
     public static function addSign($xml, $key, $cert, $signAlgorithm = XMLSecurityKey::RSA_SHA1)
     {
@@ -1010,16 +1064,17 @@ EOT;
         return $signedxml;
     }
 
-
-
-
     /**
      * Validates a signature (Message or Assertion).
      *
-     * @param string|DomDocument $xml            The element we should validate
-     * @param string|null        $cert           The pubic cert
-     * @param string|null        $fingerprint    The fingerprint of the public cert
-     * @param string|null        $fingerprintalg The algorithm used to get the fingerprint
+     * @param string|DomNode $xml            The element we should validate
+     * @param string|null    $cert           The pubic cert
+     * @param string|null    $fingerprint    The fingerprint of the public cert
+     * @param string|null    $fingerprintalg The algorithm used to get the fingerprint
+     *
+     * @return bool
+     *
+     * @throws Exception
      */
     public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
     {
@@ -1030,22 +1085,6 @@ EOT;
         } else {
             $dom = new DOMDocument();
             $dom = self::loadXML($dom, $xml);
-        }
-
-        # Check if Reference URI is empty
-        try {
-            $signatureElems = $dom->getElementsByTagName('Signature');
-            foreach ($signatureElems as $signatureElem) {
-                $referenceElems = $dom->getElementsByTagName('Reference');
-                if (count($referenceElems) > 0) {
-                    $referenceElem = $referenceElems->item(0);
-                    if ($referenceElem->getAttribute('URI') == '') {
-                        $referenceElem->setAttribute('URI', '#'.$signatureElem->parentNode->getAttribute('ID'));
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            //It's ok, let's continue;
         }
 
         $objXMLSecDSig = new XMLSecurityDSig();

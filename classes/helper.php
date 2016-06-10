@@ -103,6 +103,9 @@ class auth_easysaml_helper {
         $config = get_config(self::CONFIGNAME);
 
         $wwwroot = $CFG->httpswwwroot;
+        if (!empty($CFG->loginhttps)) {
+            $wwwroot = str_replace('http:', 'https:', $wwwroot);
+        }
 
         $settings = array(
             'strict' => true,
@@ -177,7 +180,6 @@ class auth_easysaml_helper {
         }
 
         $auth = new OneLogin_Saml2_Auth($settings);
-        $auth->setPostCallback(array(__CLASS__, 'post_callback'));
         return $auth;
     }
 
@@ -231,7 +233,13 @@ class auth_easysaml_helper {
     public function handle_slo() {
         $auth = $this->get_auth();
 
-        $auth->processSLO(false, null, false, array(__CLASS__, 'logout_callback'));
+        $result = $auth->processSLO(false, null, false, array(__CLASS__, 'logout_callback'), true);
+        if (is_string($result)) {
+            redirect($result);
+        } else if (is_array($result)) {
+            $this->post_redirect($result['action'], $result['parameters']);
+        }
+
         $errors = $auth->getErrors();
         if (!empty($errors)) {
             debugging('auth_easysaml slo errors: ' . implode(', ', $errors) .
@@ -243,16 +251,16 @@ class auth_easysaml_helper {
         require_logout();
     }
 
-    public static function post_callback($action, array $parameters) {
+    private function post_redirect($action, array $parameters) {
         global $PAGE, $OUTPUT;
 
+        $PAGE->set_context(context_system::instance());
         $PAGE->set_title(get_string('logout'));
         $PAGE->set_cacheable(false);
         $PAGE->set_pagelayout('maintenance');
-        $PAGE->requires->js_init_code('Y.one("#saml-logout").submit();');
+        $PAGE->requires->js_init_code('document.getElementById("saml-logout").submit();');
 
         echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('logout'));
 
         $formattrs = array(
             'method' => 'POST',
@@ -260,16 +268,19 @@ class auth_easysaml_helper {
             'id' => 'saml-logout',
         );
         echo html_writer::start_tag('form', $formattrs);
+        echo html_writer::start_tag('noscript');
+
+        echo $OUTPUT->heading(get_string('logout'));
 
         echo $OUTPUT->box_start('generalbox', 'notice');
         echo html_writer::tag('p', get_string('logoutmessage', 'auth_easysaml'));
-
         echo html_writer::div(html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('continue'))), 'buttons');
+        echo $OUTPUT->box_end();
+        echo html_writer::end_tag('noscript');
 
         foreach ($parameters as $name => $value) {
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $name, 'value' => $value));
         }
-        echo $OUTPUT->box_end();
 
         echo html_writer::end_tag('form');
 
