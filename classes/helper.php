@@ -17,15 +17,15 @@
 /**
  * Moodle-to-OneLogin library interface.
  *
- * @package    auth_simplesaml
+ * @package    auth_easysaml
  * @copyright  2015 Jonathon Fowler <jf@jonof.id.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-class auth_simplesaml_helper {
-    const CONFIGNAME = 'auth/simplesaml';
+class auth_easysaml_helper {
+    const CONFIGNAME = 'auth/easysaml';
 
     public function __construct() {
         // The essence of _toolkit_loader.php.
@@ -98,7 +98,7 @@ class auth_simplesaml_helper {
         global $CFG;
 
         if (!self::is_configured()) {
-            throw new moodle_exception('errornotconfigured', 'auth_simplesaml');
+            throw new moodle_exception('errornotconfigured', 'auth_easysaml');
         }
         $config = get_config(self::CONFIGNAME);
 
@@ -110,12 +110,12 @@ class auth_simplesaml_helper {
 
             // Define ourselves.
             'sp' => array(
-                'entityId' => $wwwroot . '/auth/simplesaml/metadata.php',
+                'entityId' => $wwwroot . '/auth/easysaml/metadata.php',
                 'assertionConsumerService' => array(
-                    'url' => $wwwroot . '/auth/simplesaml/acs.php',
+                    'url' => $wwwroot . '/auth/easysaml/acs.php',
                 ),
                 'singleLogoutService' => array(
-                    'url' => $wwwroot . '/auth/simplesaml/sls.php',
+                    'url' => $wwwroot . '/auth/easysaml/sls.php',
                 ),
                 'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
             ),
@@ -189,8 +189,8 @@ class auth_simplesaml_helper {
         if (empty($errors)) {
             return $metadata;
         } else {
-            debugging('auth_simplesaml sp metadata errors: ' . implode(', ', $errors), DEBUG_NORMAL);
-            throw new moodle_exception('errorbadconfiguration', 'auth_simplesaml');
+            debugging('auth_easysaml sp metadata errors: ' . implode(', ', $errors), DEBUG_NORMAL);
+            throw new moodle_exception('errorbadconfiguration', 'auth_easysaml');
         }
     }
 
@@ -202,28 +202,28 @@ class auth_simplesaml_helper {
 
         $errors = $auth->getErrors();
         if (!empty($errors)) {
-            debugging('auth_simplesaml acs errors: ' . implode(', ', $errors) .
+            debugging('auth_easysaml acs errors: ' . implode(', ', $errors) .
                 ' (' . $auth->getLastErrorReason() . ')', DEBUG_NORMAL);
         }
 
         if (!$auth->isAuthenticated()) {
-            unset($SESSION->auth_simplesaml_nameid);
-            unset($SESSION->auth_simplesaml_sessionindex);
-            unset($SESSION->auth_simplesaml_userinfo);
+            unset($SESSION->auth_easysaml_nameid);
+            unset($SESSION->auth_easysaml_sessionindex);
+            unset($SESSION->auth_easysaml_userinfo);
             return false;
         }
 
         $attrs = $auth->getAttributes();
         $userinfo = $this->process_attributes($attrs);
-        //debugging('auth_simplesaml acs attributes: ' . var_export($attrs, true), DEBUG_DEVELOPER);
+        //debugging('auth_easysaml acs attributes: ' . var_export($attrs, true), DEBUG_DEVELOPER);
         if (!isset($userinfo['username']) || trim($userinfo['username']) === '') {
-            debugging('auth_simplesaml acs: no username attribute found in response', DEBUG_NORMAL);
-            throw new moodle_exception('errornotauthenticated', 'auth_simplesaml');
+            debugging('auth_easysaml acs: no username attribute found in response', DEBUG_NORMAL);
+            throw new moodle_exception('errornotauthenticated', 'auth_easysaml');
         }
 
-        $SESSION->auth_simplesaml_nameid = $auth->getNameId();
-        $SESSION->auth_simplesaml_sessionindex = $auth->getSessionIndex();
-        $SESSION->auth_simplesaml_userinfo = $userinfo;
+        $SESSION->auth_easysaml_nameid = $auth->getNameId();
+        $SESSION->auth_easysaml_sessionindex = $auth->getSessionIndex();
+        $SESSION->auth_easysaml_userinfo = $userinfo;
 
         return true;
     }
@@ -234,7 +234,7 @@ class auth_simplesaml_helper {
         $auth->processSLO(false, null, false, array(__CLASS__, 'logout_callback'));
         $errors = $auth->getErrors();
         if (!empty($errors)) {
-            debugging('auth_simplesaml slo errors: ' . implode(', ', $errors) .
+            debugging('auth_easysaml slo errors: ' . implode(', ', $errors) .
                 ' (' . $auth->getLastErrorReason() . ')', DEBUG_NORMAL);
         }
     }
@@ -262,7 +262,7 @@ class auth_simplesaml_helper {
         echo html_writer::start_tag('form', $formattrs);
 
         echo $OUTPUT->box_start('generalbox', 'notice');
-        echo html_writer::tag('p', get_string('logoutmessage', 'auth_simplesaml'));
+        echo html_writer::tag('p', get_string('logoutmessage', 'auth_easysaml'));
 
         echo html_writer::div(html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('continue'))), 'buttons');
 

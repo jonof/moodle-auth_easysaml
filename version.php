@@ -17,7 +17,7 @@
 /**
  * Version details
  *
- * @package    auth_simplesaml
+ * @package    auth_easysaml
  * @copyright  2015 Jonathon Fowler <jf@jonof.id.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,4 +26,4 @@ defined('MOODLE_INTERNAL') || die;
 
 $plugin->version   = 2015031700;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2013111800;        // Requires this Moodle version
-$plugin->component = 'auth_simplesaml'; // Full name of the plugin (used for diagnostics)
+$plugin->component = 'auth_easysaml';   // Full name of the plugin (used for diagnostics)

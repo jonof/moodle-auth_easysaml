@@ -1,4 +1,4 @@
-Simplified SAML authentication plugin for Moodle
+Easy SAML authentication plugin for Moodle
 by Jonathon Fowler <jf@jonof.id.au>
 
 The perks of this plugin:
@@ -11,8 +11,8 @@ The perks of this plugin:
     need be.
 
 The limitations of this plugin:
-  - No enrolment handling functionality. This is a simplified
-    plugin after all.
+  - No enrolment handling functionality. This is a simple and
+    easy-to-use plugin after all.
 
 The PHP mcrypt extension is required for SAML signing,
 encryption, and decryption functionality.

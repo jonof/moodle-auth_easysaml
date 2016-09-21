@@ -17,7 +17,7 @@
 /**
  * SAML Single Logout Service endpoint.
  *
- * @package    auth_simplesaml
+ * @package    auth_easysaml
  * @copyright  2015 Jonathon Fowler <jf@jonof.id.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,10 +27,10 @@ require_once '../../config.php';
 
 $PAGE->https_required();
 
-$helper = new auth_simplesaml_helper();
+$helper = new auth_easysaml_helper();
 $helper->handle_slo();
 
-$returnurl = get_config('auth/simplesaml', 'return_url');
+$returnurl = get_config('auth/easysaml', 'return_url');
 if (empty($returnurl)) {
     $returnurl = $CFG->wwwroot . '/';
 }

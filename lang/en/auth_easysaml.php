@@ -1,6 +1,6 @@
 <?php
 
-$string['auth_simplesamldescription'] = 'Simplified SAML2 authentication plugin.
+$string['auth_easysamldescription'] = 'Easy SAML2 authentication plugin.
 
 The IdP will need to be configured with these parameters:
 
@@ -45,7 +45,7 @@ $string['idp_certfingerprint'] = 'Certificate fingerprint';
 $string['idp_certfingerprint_desc'] = 'The <strong>SHA1</strong> fingerprint of the certificate that signs SAML IdP responses (formatted <code>XX:XX:XX:...:XX</code>). This is a simpler method for validating the signature if you don\'t wish to use the full certificate.';
 $string['logoutmessage'] = 'Your browser should redirect automatically to complete the logout operation. If it does not, please press the "Continue" button below.';
 $string['nomcryptnotice'] = 'The PHP mcrypt module is not enabled so many encryption and signing functions are not available.';
-$string['pluginname'] = 'Simplified SAML';
+$string['pluginname'] = 'Easy SAML';
 $string['prefersso'] = 'Prefer SSO';
 $string['prefersso_desc'] = 'Whether to automatically send the user for sign on when the login page is accessed. When this is enabled, the redirection can be avoided with <code>{$a}</code>.';
 $string['return_url'] = 'Logout return URL';

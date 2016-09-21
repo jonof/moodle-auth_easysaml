@@ -17,7 +17,7 @@
 /**
  * Simple SAML authentication plugin.
  *
- * @package    auth_simplesaml
+ * @package    auth_easysaml
  * @copyright  2015 Jonathon Fowler <jf@jonof.id.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,12 +26,12 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once $CFG->libdir . '/authlib.php';
 
-class auth_plugin_simplesaml extends auth_plugin_base {
+class auth_plugin_easysaml extends auth_plugin_base {
     private static $auth = null;
-    const CONFIGNAME = 'auth/simplesaml';
+    const CONFIGNAME = 'auth/easysaml';
 
     public function __construct() {
-        $this->authtype = 'simplesaml';
+        $this->authtype = 'easysaml';
         $this->config = get_config(self::CONFIGNAME);
     }
 
@@ -42,7 +42,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
      */
     private function get_auth() {
         if (self::$auth === null) {
-            $helper = new auth_simplesaml_helper();
+            $helper = new auth_easysaml_helper();
             self::$auth = $helper->get_auth();
         }
         return self::$auth;
@@ -51,34 +51,34 @@ class auth_plugin_simplesaml extends auth_plugin_base {
     public function loginpage_hook() {
         global $frm, $SESSION;
 
-        if (!auth_simplesaml_helper::is_configured()) {
+        if (!auth_easysaml_helper::is_configured()) {
             return;
         }
 
         if (isset($_GET['sso'])) {
             // Explicitly do want redirection.
             $wantsso = true;
-            unset($SESSION->auth_simplesaml_nosso);
+            unset($SESSION->auth_easysaml_nosso);
         } else if (isset($_GET['nosso'])) {
             // Explicitly don't want redirection.
             $wantsso = false;
 
             // Remember this so if the user fails on the login form we
             // don't try and redirect them on reloading.
-            $SESSION->auth_simplesaml_nosso = true;
+            $SESSION->auth_easysaml_nosso = true;
         } else {
             // Be guided by configuration preference and whether
             // we avoided redirection last time through.
             $wantsso = !empty($this->config->prefersso) &&
-                empty($SESSION->auth_simplesaml_nosso);
+                empty($SESSION->auth_easysaml_nosso);
         }
         if (!$wantsso) {
             return;
         }
 
         $auth = $this->get_auth();
-        if (!isset($SESSION->auth_simplesaml_userinfo) ||
-                !is_array($SESSION->auth_simplesaml_userinfo)) {
+        if (!isset($SESSION->auth_easysaml_userinfo) ||
+                !is_array($SESSION->auth_easysaml_userinfo)) {
             $url = new moodle_url(get_login_url(), array('sso' => 1));
             $auth->login($url->out_as_local_url(false));
 
@@ -86,7 +86,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         }
 
         $frm = new stdClass();
-        $frm->username = $SESSION->auth_simplesaml_userinfo['username'];
+        $frm->username = $SESSION->auth_easysaml_userinfo['username'];
         $frm->password = '';
     }
 
@@ -101,7 +101,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
      */
     public function user_login($username, $password) {
         global $SESSION;
-        if (empty($SESSION->auth_simplesaml_userinfo)) {
+        if (empty($SESSION->auth_easysaml_userinfo)) {
             return false;
         }
         return true;
@@ -121,28 +121,28 @@ class auth_plugin_simplesaml extends auth_plugin_base {
      */
     public function get_userinfo($username) {
         global $SESSION;
-        if (empty($SESSION->auth_simplesaml_userinfo)) {
-            debugging('auth_simplesaml get_userinfo called when not authed', DEBUG_DEVELOPER);
+        if (empty($SESSION->auth_easysaml_userinfo)) {
+            debugging('auth_easysaml get_userinfo called when not authed', DEBUG_DEVELOPER);
             return false;
         }
-        if ($SESSION->auth_simplesaml_userinfo['username'] !== $username) {
-            debugging('auth_simplesaml get_userinfo called for a different user', DEBUG_DEVELOPER);
+        if ($SESSION->auth_easysaml_userinfo['username'] !== $username) {
+            debugging('auth_easysaml get_userinfo called for a different user', DEBUG_DEVELOPER);
             return false;
         }
 
-        return $SESSION->auth_simplesaml_userinfo;
+        return $SESSION->auth_easysaml_userinfo;
     }
 
     public function logoutpage_hook() {
         global $SESSION, $CFG;
         if (empty($this->config->idp_slourl) ||
-                !isset($SESSION->auth_simplesaml_nameid) ||
-                !isset($SESSION->auth_simplesaml_sessionindex)) {
+                !isset($SESSION->auth_easysaml_nameid) ||
+                !isset($SESSION->auth_easysaml_sessionindex)) {
             return;
         }
 
-        $nameid = $SESSION->auth_simplesaml_nameid;
-        $sessionindex = $SESSION->auth_simplesaml_sessionindex;
+        $nameid = $SESSION->auth_easysaml_nameid;
+        $sessionindex = $SESSION->auth_easysaml_sessionindex;
 
         $auth = $this->get_auth();
 
@@ -151,7 +151,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
             // IdP, so we will emit the form, JavaScript required to trigger the
             // hand off, and exit.
 
-            $returnurl = $CFG->wwwroot . '/auth/simplesaml/sls.php';
+            $returnurl = $CFG->wwwroot . '/auth/easysaml/sls.php';
         } else {
             // Because login/logout.php won't get an opportunity to call this.
             require_logout();
@@ -170,7 +170,7 @@ class auth_plugin_simplesaml extends auth_plugin_base {
 
     private function apply_config_defaults($config) {
         if (!isset($config->idp_name) || $config->idp_name === '') {
-            $config->idp_name = get_string('defaultidpname', 'auth_simplesaml');
+            $config->idp_name = get_string('defaultidpname', 'auth_easysaml');
         }
         if (!isset($config->idp_entityid)) {
             $config->idp_entityid = '';
@@ -249,15 +249,15 @@ class auth_plugin_simplesaml extends auth_plugin_base {
         global $CFG;
 
         $a = array(
-            'metadataurl' => (string)new moodle_url('/auth/simplesaml/metadata.php'),
-            'acsurl' => (string)new moodle_url('/auth/simplesaml/acs.php'),
-            'slsurl' => (string)new moodle_url('/auth/simplesaml/sls.php'),
+            'metadataurl' => (string)new moodle_url('/auth/easysaml/metadata.php'),
+            'acsurl' => (string)new moodle_url('/auth/easysaml/acs.php'),
+            'slsurl' => (string)new moodle_url('/auth/easysaml/sls.php'),
         );
         if (!empty($CFG->loginhttps)) {
             $a = str_replace('http:', 'https:', $a);
         }
 
-        $authdescription = markdown_to_html(get_string("auth_simplesamldescription", "auth_simplesaml", $a));
+        $authdescription = markdown_to_html(get_string("auth_easysamldescription", "auth_easysaml", $a));
         return $authdescription;
     }
 
@@ -314,14 +314,14 @@ class auth_plugin_simplesaml extends auth_plugin_base {
     }
 
     public function loginpage_idp_list($wantsurl) {
-        if (!auth_simplesaml_helper::is_configured()) {
+        if (!auth_easysaml_helper::is_configured()) {
             return array();
         }
 
         return array(
             array(
                 'url' => new moodle_url(get_login_url(), array('sso' => 1)),
-                'icon' => new pix_icon('idp', '', 'auth_simplesaml'),
+                'icon' => new pix_icon('idp', '', 'auth_easysaml'),
                 'name' => $this->config->idp_name,
             )
         );

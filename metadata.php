@@ -17,7 +17,7 @@
 /**
  * SAML Metadata endpoint.
  *
- * @package    auth_simplesaml
+ * @package    auth_easysaml
  * @copyright  2015 Jonathon Fowler <jf@jonof.id.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@ require_once '../../config.php';
 
 $PAGE->https_required();
 
-$helper = new auth_simplesaml_helper();
+$helper = new auth_easysaml_helper();
 $metadata = $helper->get_metadata();
 
 header('Content-Type: text/xml');
