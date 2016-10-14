@@ -43,8 +43,8 @@ class OneLogin_Saml2_AuthnRequest
 
         $id = OneLogin_Saml2_Utils::generateUniqueID();
         $issueInstant = OneLogin_Saml2_Utils::parseTime2SAML(time());
-        $nameIdPolicyStr = '';
 
+        $nameIdPolicyStr = '';
         if ($setNameIdPolicy) {
             $nameIDPolicyFormat = $spData['NameIDFormat'];
             if (isset($security['wantNameIdEncrypted']) && $security['wantNameIdEncrypted']) {
@@ -137,12 +137,22 @@ AUTHNREQUEST;
 
     /**
      * Returns deflated, base64 encoded, unsigned AuthnRequest.
-     *
+     * 
+     * @param bool|null $deflate Whether or not we should 'gzdeflate' the request body before we return it.
      */
-    public function getRequest()
+    public function getRequest($deflate = null)
     {
-        $deflatedRequest = gzdeflate($this->_authnRequest);
-        $base64Request = base64_encode($deflatedRequest);
+        $subject = $this->_authnRequest;
+
+        if (is_null($deflate)) {
+            $deflate = $this->_settings->shouldCompressRequests();
+        }
+
+        if ($deflate) {
+            $subject = gzdeflate($this->_authnRequest);
+        }
+
+        $base64Request = base64_encode($subject);
         return $base64Request;
     }
 
