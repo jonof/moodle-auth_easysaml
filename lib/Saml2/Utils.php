@@ -1,5 +1,5 @@
 <?php
-
+ 
 /**
  * Utils of OneLogin PHP Toolkit
  *
@@ -8,14 +8,22 @@
 
 class OneLogin_Saml2_Utils
 {
+    const RESPONSE_SIGNATURE_XPATH = "/samlp:Response/ds:Signature";
+    const ASSERTION_SIGNATURE_XPATH = "/samlp:Response/saml:Assertion/ds:Signature";
+
     /**
-    * Translates any string. Accepts args
-    *
-    * @param string $msg  Message to be translated
-    * @param array|null $args Arguments
-    *
-    * @return string $translatedMsg  Translated text
-    */
+     * @var bool Control if the `Forwarded-For-*` headers are used
+     */
+    private static $_proxyVars = false;
+
+    /**
+     * Translates any string. Accepts args
+     *
+     * @param string $msg Message to be translated
+     * @param array|null $args Arguments
+     *
+     * @return string $translatedMsg  Translated text
+     */
     public static function t($msg, $args = array())
     {
         assert('is_string($msg)');
@@ -232,7 +240,7 @@ class OneLogin_Saml2_Utils
             );
         }
 
-
+        
         /* Add encoded parameters */
         if (strpos($url, '?') === false) {
             $paramPrefix = '?';
@@ -323,6 +331,22 @@ EOT;
     //END MOODLE
 
     /**
+     * @param $proxyVars bool Whether to use `X-Forwarded-*` headers to determine port/domain/protocol
+     */
+    public static function setProxyVars($proxyVars)
+    {
+        self::$_proxyVars = (bool)$proxyVars;
+    }
+
+    /**
+     * return bool
+     */
+    public static function getProxyVars()
+    {
+        return self::$_proxyVars;
+    }
+
+    /**
      * Returns the protocol + the current host + the port (if different than
      * common ports).
      *
@@ -340,11 +364,7 @@ EOT;
             $protocol = 'http';
         }
 
-        if (isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
-            $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
-        } else if (isset($_SERVER["SERVER_PORT"])) {
-            $portnumber = $_SERVER["SERVER_PORT"];
-        }
+        $portnumber = self::getSelfPort();
 
         if (isset($portnumber) && ($portnumber != '80') && ($portnumber != '443')) {
             $port = ':' . $portnumber;
@@ -354,13 +374,10 @@ EOT;
     }
 
     /**
-     * Returns the current host.
-     *
-     * @return string $currentHost The current host
+     * @return string The raw host name
      */
-    public static function getSelfHost()
+    protected static function getRawHost()
     {
-
         if (array_key_exists('HTTP_HOST', $_SERVER)) {
             $currentHost = $_SERVER['HTTP_HOST'];
         } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
@@ -372,15 +389,48 @@ EOT;
                 $currentHost = php_uname("n");
             }
         }
+        return $currentHost;
+    }
 
-        if (strstr($currentHost, ":")) {
-            $currentHostData = explode(":", $currentHost);
-            $possiblePort = array_pop($currentHostData);
-            if (is_numeric($possiblePort)) {
-                $currentHost = implode(':', $currentHostData);
+    /**
+     * Returns the current host.
+     *
+     * @return string $currentHost The current host
+     */
+    public static function getSelfHost()
+    {
+        $currentHost = self::getRawHost();
+
+        // strip the port
+        if (false !== strpos($currentHost, ':')) {
+            list($currentHost, $port) = explode(':', $currentHost, 2);
+        }
+
+        return $currentHost;
+    }
+
+    /**
+     * @return null|string The port number used for the request
+     */
+    public static function getSelfPort()
+    {
+        $portnumber = null;
+        if (self::getProxyVars() && isset($_SERVER["HTTP_X_FORWARDED_PORT"])) {
+            $portnumber = $_SERVER["HTTP_X_FORWARDED_PORT"];
+        } else if (isset($_SERVER["SERVER_PORT"])) {
+            $portnumber = $_SERVER["SERVER_PORT"];
+        } else {
+            $currentHost = self::getRawHost();
+
+            // strip the port
+            if (false !== strpos($currentHost, ':')) {
+                list($currentHost, $port) = explode(':', $currentHost, 2);
+                if (is_numeric($port)) {
+                    $portnumber = $port;
+                }
             }
         }
-        return $currentHost;
+        return $portnumber;
     }
 
     /**
@@ -391,8 +441,8 @@ EOT;
     public static function isHTTPS()
     {
         $isHttps =  (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                    || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
-                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
+                    || (self::getSelfPort() == 443)
+                    || (self::getProxyVars() && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https');
         return $isHttps;
     }
 
@@ -666,7 +716,7 @@ EOT;
      *
      * @param DOMDocument $dom     The DOMDocument
      * @param string      $query   Xpath Expresion
-     * @param DomElement  $context Context Node (DomElement)
+     * @param DomElement  $context Context Node (DomElement) 
      *
      * @return DOMNodeList The queried nodes
      */
@@ -842,26 +892,25 @@ EOT;
         $status = array();
 
         $statusEntry = self::query($dom, '/samlp:Response/samlp:Status');
-        if ($statusEntry->length == 0) {
-            throw new Exception('Missing Status on response');
+        if ($statusEntry->length != 1) {
+            throw new Exception('Missing valid Status on response');
         }
 
         $codeEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusCode', $statusEntry->item(0));
-        if ($codeEntry->length == 0) {
-            throw new Exception('Missing Status Code on response');
+        if ($codeEntry->length != 1) {
+            throw new Exception('Missing valid Status Code on response');
         }
         $code = $codeEntry->item(0)->getAttribute('Value');
         $status['code'] = $code;
 
+        $status['msg'] = '';
         $messageEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusMessage', $statusEntry->item(0));
         if ($messageEntry->length == 0) {
             $subCodeEntry = self::query($dom, '/samlp:Response/samlp:Status/samlp:StatusCode/samlp:StatusCode', $statusEntry->item(0));
-            if ($subCodeEntry->length > 0) {
+            if ($subCodeEntry->length == 1) {
                 $status['msg'] = $subCodeEntry->item(0)->getAttribute('Value');
-            } else {
-                $status['msg'] = '';
             }
-        } else {
+        } else if ($messageEntry->length == 1) {
             $msg = $messageEntry->item(0)->textContent;
             $status['msg'] = $msg;
         }
@@ -959,7 +1008,7 @@ EOT;
         if (!$newDoc) {
             throw new Exception('Failed to parse decrypted XML.');
         }
-
+ 
         $decryptedElement = $newDoc->firstChild->firstChild;
         if ($decryptedElement === null) {
             throw new Exception('Missing encrypted element.');
@@ -1071,12 +1120,13 @@ EOT;
      * @param string|null    $cert           The pubic cert
      * @param string|null    $fingerprint    The fingerprint of the public cert
      * @param string|null    $fingerprintalg The algorithm used to get the fingerprint
+     * @param string|null    $xpath          The xpath of the signed element
      *
      * @return bool
      *
      * @throws Exception
      */
-    public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1')
+    public static function validateSign($xml, $cert = null, $fingerprint = null, $fingerprintalg = 'sha1', $xpath=null)
     {
         if ($xml instanceof DOMDocument) {
             $dom = clone $xml;
@@ -1090,7 +1140,14 @@ EOT;
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = array('ID');
 
-        $objDSig = $objXMLSecDSig->locateSignature($dom);
+        if ($xpath) {
+            $nodeset = OneLogin_Saml2_Utils::query($dom, $xpath);
+            $objDSig = $nodeset->item(0);
+            $objXMLSecDSig->sigNode = $objDSig;
+        } else {
+            $objDSig = $objXMLSecDSig->locateSignature($dom);
+        }
+
         if (!$objDSig) {
             throw new Exception('Cannot locate Signature Node');
         }
