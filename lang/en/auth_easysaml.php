@@ -35,6 +35,7 @@ $string['idp_name_desc'] = 'A user-friendly name for the Identity Provider for d
 $string['idp_ssourl'] = 'SSO URL';
 $string['idp_ssourl_desc'] = 'The URL of the Single Sign On service using "HTTP-Redirect" binding.';
 $string['idp_slobinding'] = 'SLO Binding';
+$string['idp_slobinding_desc'] = '';
 $string['idp_slourl'] = 'SLO Request URL';
 $string['idp_slourl_desc'] = 'The URL of the Single Log Out service\'s request endpoint.';
 $string['idp_sloresponseurl'] = 'SLO Response URL';

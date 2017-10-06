@@ -28,7 +28,7 @@ require_once $CFG->libdir . '/authlib.php';
 
 class auth_plugin_easysaml extends auth_plugin_base {
     private static $auth = null;
-    const CONFIGNAME = 'auth/easysaml';
+    const CONFIGNAME = 'auth_easysaml';
 
     public function __construct() {
         $this->authtype = 'easysaml';
@@ -168,83 +168,6 @@ class auth_plugin_easysaml extends auth_plugin_base {
         throw new coding_exception("shouldn't have reached here");
     }
 
-    private function apply_config_defaults($config) {
-        if (!isset($config->idp_name) || $config->idp_name === '') {
-            $config->idp_name = get_string('defaultidpname', 'auth_easysaml');
-        }
-        if (!isset($config->idp_entityid)) {
-            $config->idp_entityid = '';
-        }
-        if (!isset($config->idp_ssourl)) {
-            $config->idp_ssourl = '';
-        }
-        if (!isset($config->idp_slourl)) {
-            $config->idp_slourl = '';
-        }
-        if (!isset($config->idp_sloresponseurl)) {
-            $config->idp_sloresponseurl = '';
-        }
-        if (!isset($config->idp_slobinding)) {
-            $config->idp_slobinding = 'redirect';
-        }
-        if (!isset($config->idp_cert)) {
-            $config->idp_cert = '';
-        }
-        if (!isset($config->idp_certfingerprint)) {
-            $config->idp_certfingerprint = '';
-        }
-        if (!isset($config->prefersso)) {
-            $config->prefersso = 0;
-        }
-        if (!isset($config->username_attribute)) {
-            $config->username_attribute = '';
-        }
-        if (!isset($config->sp_cert)) {
-            $config->sp_cert = '';
-        }
-        if (!isset($config->sp_privatekey)) {
-            $config->sp_privatekey = '';
-        }
-        if (!isset($config->signmetadata)) {
-            $config->signmetadata = 0;
-        }
-        if (!isset($config->encryptnameid)) {
-            $config->encryptnameid = 0;
-        }
-        if (!isset($config->signauthrequests)) {
-            $config->signauthrequests = 0;
-        }
-        if (!isset($config->signlogoutrequests)) {
-            $config->signlogoutrequests = 0;
-        }
-        if (!isset($config->signlogoutresponses)) {
-            $config->signlogoutresponses = 0;
-        }
-        if (!isset($config->wantencryptedasserts)) {
-            $config->wantencryptedasserts = 0;
-        }
-        if (!isset($config->wantsignedasserts)) {
-            $config->wantsignedasserts = 0;
-        }
-        if (!isset($config->wantencryptednameid)) {
-            $config->wantencryptednameid = 0;
-        }
-        if (!isset($config->wantsignedmessages)) {
-            $config->wantsignedmessages = 0;
-        }
-        if (!isset($config->return_url)) {
-            $config->return_url = '';
-        }
-        if (!isset($config->change_password_url)) {
-            $config->change_password_url = '';
-        }
-    }
-
-    public function config_form($config, $err, $user_fields) {
-        $this->apply_config_defaults($config);
-        include "config_form.php";
-    }
-
     public function get_description() {
         global $CFG;
 
@@ -278,39 +201,6 @@ class auth_plugin_easysaml extends auth_plugin_base {
             return new moodle_url($this->config->change_password_url);
         }
         return null;
-    }
-
-    public function process_config($config) {
-        $this->apply_config_defaults($config);
-
-        set_config('idp_name', $config->idp_name, self::CONFIGNAME);
-        set_config('idp_entityid', $config->idp_entityid, self::CONFIGNAME);
-        set_config('idp_ssourl', $config->idp_ssourl, self::CONFIGNAME);
-        set_config('idp_slourl', $config->idp_slourl, self::CONFIGNAME);
-        set_config('idp_sloresponseurl', $config->idp_sloresponseurl, self::CONFIGNAME);
-        set_config('idp_slobinding', $config->idp_slobinding, self::CONFIGNAME);
-        set_config('idp_cert', $config->idp_cert, self::CONFIGNAME);
-        set_config('idp_certfingerprint', $config->idp_certfingerprint, self::CONFIGNAME);
-        set_config('username_attribute', $config->username_attribute, self::CONFIGNAME);
-        set_config('prefersso', !empty($config->prefersso), self::CONFIGNAME);
-        set_config('sp_cert', $config->sp_cert, self::CONFIGNAME);
-        set_config('sp_privatekey', $config->sp_privatekey, self::CONFIGNAME);
-        set_config('signmetadata', $config->signmetadata, self::CONFIGNAME);
-        set_config('encryptnameid', $config->encryptnameid, self::CONFIGNAME);
-        set_config('signauthrequests', $config->signauthrequests, self::CONFIGNAME);
-        set_config('signlogoutrequests', $config->signlogoutrequests, self::CONFIGNAME);
-        set_config('signlogoutresponses', $config->signlogoutresponses, self::CONFIGNAME);
-        set_config('wantencryptedasserts', $config->wantencryptedasserts, self::CONFIGNAME);
-        set_config('wantsignedasserts', $config->wantsignedasserts, self::CONFIGNAME);
-        set_config('wantencryptednameid', $config->wantencryptednameid, self::CONFIGNAME);
-        set_config('wantsignedmessages', $config->wantsignedmessages, self::CONFIGNAME);
-
-        set_config('return_url', $config->return_url, self::CONFIGNAME);
-        set_config('change_password_url', $config->change_password_url, self::CONFIGNAME);
-
-        // Field mappings/locks/etc are saved by the caller.
-
-        return true;
     }
 
     public function loginpage_idp_list($wantsurl) {

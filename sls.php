@@ -30,7 +30,7 @@ $PAGE->https_required();
 $helper = new auth_easysaml_helper();
 $helper->handle_slo();
 
-$returnurl = get_config('auth/easysaml', 'return_url');
+$returnurl = get_config('auth_easysaml', 'return_url');
 if (empty($returnurl)) {
     $returnurl = $CFG->wwwroot . '/';
 }

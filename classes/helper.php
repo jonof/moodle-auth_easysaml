@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 class auth_easysaml_helper {
-    const CONFIGNAME = 'auth/easysaml';
+    const CONFIGNAME = 'auth_easysaml';
 
     public function __construct() {
         // The essence of _toolkit_loader.php.
@@ -119,6 +119,7 @@ class auth_easysaml_helper {
                 ),
                 'singleLogoutService' => array(
                     'url' => $wwwroot . '/auth/easysaml/sls.php',
+                    'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
                 ),
                 'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
             ),
