@@ -15,15 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Plugin upgrade steps.
  *
  * @package    auth_easysaml
  * @copyright  2015 Jonathon Fowler <jf@jonof.id.au>
+ * @copyright  2017 The University of Southern Queensland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017092700;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2017051500;        // Requires this Moodle version
-$plugin->component = 'auth_easysaml';   // Full name of the plugin (used for diagnostics)
+/**
+ * Function to upgrade auth_easysaml.
+ * @param int $oldversion the version we are upgrading from
+ * @return bool result
+ */
+function xmldb_auth_easysaml_upgrade($oldversion) {
+    global $CFG, $DB;
+
+    if ($oldversion < 2017092700) {
+        // Convert info in config plugins from auth/easysaml to auth_easysaml.
+        upgrade_fix_config_auth_plugin_names('easysaml');
+        upgrade_fix_config_auth_plugin_defaults('easysaml');
+        upgrade_plugin_savepoint(true, 2017092700, 'auth', 'easysaml');
+    }
+
+    return true;
+}
