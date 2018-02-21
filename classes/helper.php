@@ -178,6 +178,7 @@ class auth_easysaml_helper {
         }
         if (!empty($config->idp_certfingerprint)) {
             $settings['idp']['certFingerprint'] = $config->idp_certfingerprint;
+            $settings['idp']['certFingerprintAlgorithm'] = $config->idp_certfingerprintalgo;
         }
 
         $auth = new OneLogin_Saml2_Auth($settings);

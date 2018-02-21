@@ -125,7 +125,7 @@ class auth_plugin_easysaml extends auth_plugin_base {
             debugging('auth_easysaml get_userinfo called when not authed', DEBUG_DEVELOPER);
             return false;
         }
-        if ($SESSION->auth_easysaml_userinfo['username'] !== $username) {
+        if (strcasecmp($SESSION->auth_easysaml_userinfo['username'], $username) !== 0) {
             debugging('auth_easysaml get_userinfo called for a different user', DEBUG_DEVELOPER);
             return false;
         }

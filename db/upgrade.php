@@ -40,5 +40,12 @@ function xmldb_auth_easysaml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017092700, 'auth', 'easysaml');
     }
 
+    if ($oldversion < 2018022100) {
+        if (get_config('auth_easysaml', 'idp_certfingerprint') != '') {
+            set_config('idp_certfingerprintalgo', 'sha1', 'auth_easysaml');
+        }
+        upgrade_plugin_savepoint(true, 2018022100, 'auth', 'easysaml');
+    }
+
     return true;
 }

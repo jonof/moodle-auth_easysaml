@@ -17,11 +17,10 @@ The limitations of this plugin:
 The PHP mcrypt extension is required for SAML signing,
 encryption, and decryption functionality.
 
+This plugin was developed with simpleSAMLphp as IdP, and has
+had heavy production use with F5 BIG-IP APM (11.6) as IdP.
+
 The OneLogin php-saml library provides the SAML2 services and
 is available from https://github.com/onelogin/php-saml.
 The lib and extlib directories of that library are used in
 this plugin.
-
-This plugin was developed using simpleSAMLphp as IdP and has
-had (to date) limited use with F5 APM as IdP.
-

@@ -69,6 +69,17 @@ if ($ADMIN->fulltree) {
         new lang_string('idp_certfingerprint_desc', 'auth_easysaml'),
         '', PARAM_RAW_TRIMMED, 40
     ));
+    $settings->add(new admin_setting_configselect('auth_easysaml/idp_certfingerprintalgo',
+        new lang_string('idp_certfingerprintalgo', 'auth_easysaml'),
+        new lang_string('idp_certfingerprintalgo_desc', 'auth_easysaml'),
+        'sha256',
+        [
+            'sha512' => 'SHA512',
+            'sha384' => 'SHA384',
+            'sha256' => 'SHA256',
+            'sha1'   => 'SHA1',
+        ]
+    ));
     $settings->add(new admin_setting_configtext('auth_easysaml/idp_name',
         new lang_string('idp_name', 'auth_easysaml'),
         new lang_string('idp_name_desc', 'auth_easysaml'),
