@@ -26,8 +26,10 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
+    global $CFG;
     $settings->add(new admin_setting_heading('auth_easysaml/configidp',
-        new lang_string('configidp', 'auth_easysaml'), ''
+        new lang_string('configidp', 'auth_easysaml'),
+        new lang_string('configidp_desc', 'auth_easysaml', "{$CFG->httpswwwroot}/auth/easysaml/metadata.php")
     ));
 
     $settings->add(new admin_setting_configtext('auth_easysaml/idp_entityid',

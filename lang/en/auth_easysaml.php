@@ -15,6 +15,7 @@ $string['change_password_url_desc'] = 'The location of the IdP\'s password chang
 $string['configencryption'] = 'Encryption and Signing';
 $string['configgeneral'] = 'General';
 $string['configidp'] = 'Identity Provider (IdP)';
+$string['configidp_desc'] = 'Configure the IdP with <a href="{$a}">this SP metadata</a>.';
 $string['defaultidpname'] = 'SAML';
 $string['encryptionconfignote'] = 'These settings define the signing and encryption expectations of the Identity Provider and this site.
 <ul>
