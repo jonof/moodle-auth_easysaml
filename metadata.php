@@ -26,7 +26,9 @@ define('NO_DEBUG_DISPLAY', true);
 define('NO_MOODLE_COOKIES', true);
 require_once '../../config.php';
 
-$PAGE->https_required();
+if ($CFG->version < 2017111300.00) {
+    $PAGE->https_required();
+}
 
 $helper = new auth_easysaml_helper();
 $metadata = $helper->get_metadata();

@@ -25,7 +25,9 @@
 define('NO_DEBUG_DISPLAY', true);
 require_once '../../config.php';
 
-$PAGE->https_required();
+if ($CFG->version < 2017111300.00) {
+    $PAGE->https_required();
+}
 
 $helper = new auth_easysaml_helper();
 if (!$helper->handle_acs()) {
