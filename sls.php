@@ -30,7 +30,9 @@ if ($CFG->version < 2017111300.00) {
 }
 
 $helper = new auth_easysaml_helper();
-$helper->handle_slo();
+if (!$helper->handle_slo()) {
+    throw new moodle_exception('errornotloggedout', 'auth_easysaml');
+}
 
 $returnurl = get_config('auth_easysaml', 'return_url');
 if (empty($returnurl)) {

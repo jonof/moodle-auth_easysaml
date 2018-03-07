@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die;
 class auth_easysaml_helper {
     const CONFIGNAME = 'auth_easysaml';
 
+    private $config;
+
     public function __construct() {
         // The essence of _toolkit_loader.php.
         $path = __DIR__ . '/../';
@@ -34,6 +36,17 @@ class auth_easysaml_helper {
         foreach (glob($path . '/lib/Saml2/*.php') as $file) {
             require_once $file;
         }
+    }
+
+    /**
+     * Load the plugin configuration once.
+     * @return object
+     */
+    private function get_config() {
+        if (!isset($this->config)) {
+            $this->config = get_config(self::CONFIGNAME);
+        }
+        return $this->config;
     }
 
     /**
@@ -62,7 +75,7 @@ class auth_easysaml_helper {
      */
     private function process_attributes($attrs) {
         $userinfo = array();
-        $config = get_config(self::CONFIGNAME);
+        $config = $this->get_config();
 
         $fieldmap = array('username' => $config->username_attribute);
         foreach (get_object_vars($config) as $var => $value) {
@@ -100,7 +113,7 @@ class auth_easysaml_helper {
         if (!self::is_configured()) {
             throw new moodle_exception('errornotconfigured', 'auth_easysaml');
         }
-        $config = get_config(self::CONFIGNAME);
+        $config = $this->get_config();
 
         $wwwroot = $CFG->httpswwwroot;
         if (!empty($CFG->loginhttps)) {
@@ -119,7 +132,9 @@ class auth_easysaml_helper {
                 ),
                 'singleLogoutService' => array(
                     'url' => $wwwroot . '/auth/easysaml/sls.php',
-                    'binding' => OneLogin_Saml2_Constants::BINDING_HTTP_POST,
+                    'binding' => $config->idp_slobinding === 'post' ?
+                        OneLogin_Saml2_Constants::BINDING_HTTP_POST :
+                        OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT
                 ),
                 'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
             ),
@@ -234,8 +249,10 @@ class auth_easysaml_helper {
 
     public function handle_slo() {
         $auth = $this->get_auth();
+        $config = $this->get_config();
 
-        $result = $auth->processSLO(false, null, false, array(__CLASS__, 'logout_callback'), true);
+        $retrieveParametersFromServer = $config->idp_slobinding === 'redirect';
+        $result = $auth->processSLO(false, null, $retrieveParametersFromServer, array(__CLASS__, 'logout_callback'), true);
         if (is_string($result)) {
             redirect($result);
         } else if (is_array($result)) {
@@ -246,7 +263,9 @@ class auth_easysaml_helper {
         if (!empty($errors)) {
             debugging('auth_easysaml slo errors: ' . implode(', ', $errors) .
                 ' (' . $auth->getLastErrorReason() . ')', DEBUG_NORMAL);
+            return false;
         }
+        return true;
     }
 
     public static function logout_callback() {

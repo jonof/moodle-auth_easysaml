@@ -29,6 +29,7 @@ $string['encryptnameid'] = 'Encrypt the name ID';
 $string['errorbadconfiguration'] = 'The plugin is not configured correctly.';
 $string['errornotauthenticated'] = 'Authentication was not successful.';
 $string['errornotconfigured'] = 'The plugin has not been fully configured.';
+$string['errornotloggedout'] = 'Logout was not successful.';
 $string['idp_entityid'] = 'Entity ID';
 $string['idp_entityid_desc'] = 'The entity ID of the SAML2 Identity Provider.';
 $string['idp_name'] = 'Display name';
