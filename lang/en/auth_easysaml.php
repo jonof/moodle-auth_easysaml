@@ -1,13 +1,6 @@
 <?php
 
-$string['auth_easysamldescription'] = 'Easy SAML2 authentication plugin.
-
-The IdP will need to be configured with these parameters:
-
- * SP entity ID: `{$a->metadataurl}`
- * Assertion Consumer Service URL: `{$a->acsurl}` (POST binding)
- * Single Logout Service request/response URL: `{$a->slsurl}`
-';
+$string['auth_easysamldescription'] = 'Easy SAML2 authentication plugin.';
 $string['bindingpost'] = 'POST';
 $string['bindingredirect'] = 'Redirect';
 $string['change_password_url'] = 'Change password URL';
@@ -15,7 +8,11 @@ $string['change_password_url_desc'] = 'The location of the IdP\'s password chang
 $string['configencryption'] = 'Encryption and Signing';
 $string['configgeneral'] = 'General';
 $string['configidp'] = 'Identity Provider (IdP)';
-$string['configidp_desc'] = 'Configure the IdP with <a href="{$a}">this SP metadata</a>.';
+$string['configidp_desc'] = 'The IdP will need to be configured with these parameters, or <a href="{$a->metadataurl}">this metadata</a>:
+
+ * SP entity ID: `{$a->metadataurl}`
+ * Assertion Consumer Service URL: `{$a->acsurl}` (POST binding)
+ * Single Logout Service request/response URL: `{$a->slsurl}` (POST or Redirect binding)';
 $string['defaultidpname'] = 'SAML';
 $string['encryptionconfignote'] = 'These settings define the signing and encryption expectations of the Identity Provider and this site.
 <ul>

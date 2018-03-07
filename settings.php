@@ -27,10 +27,19 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     global $CFG;
+    $a = array(
+        'metadataurl' => (string)new moodle_url('/auth/easysaml/metadata.php'),
+        'acsurl' => (string)new moodle_url('/auth/easysaml/acs.php'),
+        'slsurl' => (string)new moodle_url('/auth/easysaml/sls.php'),
+    );
+    if (!empty($CFG->loginhttps)) {
+        $a = str_replace('http:', 'https:', $a);
+    }
     $settings->add(new admin_setting_heading('auth_easysaml/configidp',
         new lang_string('configidp', 'auth_easysaml'),
-        new lang_string('configidp_desc', 'auth_easysaml', "{$CFG->httpswwwroot}/auth/easysaml/metadata.php")
+        new lang_string('configidp_desc', 'auth_easysaml', $a)
     ));
+    unset($a);
 
     $settings->add(new admin_setting_configtext('auth_easysaml/idp_entityid',
         new lang_string('idp_entityid', 'auth_easysaml'),

@@ -168,22 +168,6 @@ class auth_plugin_easysaml extends auth_plugin_base {
         throw new coding_exception("shouldn't have reached here");
     }
 
-    public function get_description() {
-        global $CFG;
-
-        $a = array(
-            'metadataurl' => (string)new moodle_url('/auth/easysaml/metadata.php'),
-            'acsurl' => (string)new moodle_url('/auth/easysaml/acs.php'),
-            'slsurl' => (string)new moodle_url('/auth/easysaml/sls.php'),
-        );
-        if (!empty($CFG->loginhttps)) {
-            $a = str_replace('http:', 'https:', $a);
-        }
-
-        $authdescription = markdown_to_html(get_string("auth_easysamldescription", "auth_easysaml", $a));
-        return $authdescription;
-    }
-
     /**
      * Determine whether to give the option to change password.
      * @return bool
