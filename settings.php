@@ -101,55 +101,49 @@ if ($ADMIN->fulltree) {
         new lang_string('configencryption', 'auth_easysaml'), ''
     ));
 
-    if (extension_loaded('mcrypt')) {
-        $settings->add(new admin_setting_configtextarea('auth_easysaml/sp_cert',
-            new lang_string('sp_cert', 'auth_easysaml'),
-            new lang_string('sp_cert_desc', 'auth_easysaml'),
-            '', PARAM_RAW_TRIMMED, 40, 3
-        ));
-        $settings->add(new admin_setting_configtextarea('auth_easysaml/sp_privatekey',
-            new lang_string('sp_privatekey', 'auth_easysaml'),
-            new lang_string('sp_privatekey_desc', 'auth_easysaml'),
-            '', PARAM_RAW_TRIMMED, 40, 3
-        ));
+    $settings->add(new admin_setting_configtextarea('auth_easysaml/sp_cert',
+        new lang_string('sp_cert', 'auth_easysaml'),
+        new lang_string('sp_cert_desc', 'auth_easysaml'),
+        '', PARAM_RAW_TRIMMED, 40, 3
+    ));
+    $settings->add(new admin_setting_configtextarea('auth_easysaml/sp_privatekey',
+        new lang_string('sp_privatekey', 'auth_easysaml'),
+        new lang_string('sp_privatekey_desc', 'auth_easysaml'),
+        '', PARAM_RAW_TRIMMED, 40, 3
+    ));
 
-        $settings->add(new admin_setting_heading('auth_easysaml/configencryptionnote',
-            '', new lang_string('encryptionconfignote', 'auth_easysaml')
-        ));
+    $settings->add(new admin_setting_heading('auth_easysaml/configencryptionnote',
+        '', new lang_string('encryptionconfignote', 'auth_easysaml')
+    ));
 
-        $settings->add(new admin_setting_configcheckbox('auth_easysaml/signmetadata',
-            new lang_string('signmetadata', 'auth_easysaml'), '',
-            0
-        ));
-        $settings->add(new admin_setting_configcheckbox('auth_easysaml/signauthrequests',
-            new lang_string('signauthrequests', 'auth_easysaml'), '',
-            0
-        ));
-        $settings->add(new admin_setting_configcheckbox('auth_easysaml/signlogoutrequests',
-            new lang_string('signlogoutrequests', 'auth_easysaml'), '',
-            0
-        ));
-        $settings->add(new admin_setting_configcheckbox('auth_easysaml/signlogoutresponses',
-            new lang_string('signlogoutresponses', 'auth_easysaml'), '',
-            0
-        ));
-        $settings->add(new admin_setting_configcheckbox('auth_easysaml/encryptnameid',
-            new lang_string('encryptnameid', 'auth_easysaml'), '',
-            0
-        ));
-        $settings->add(new admin_setting_configcheckbox('auth_easysaml/wantencryptedasserts',
-            new lang_string('wantencryptedasserts', 'auth_easysaml'), '',
-            0
-        ));
-        $settings->add(new admin_setting_configcheckbox('auth_easysaml/wantencryptednameid',
-            new lang_string('wantencryptednameid', 'auth_easysaml'), '',
-            0
-        ));
-    } else {
-        $settings->add(new admin_setting_heading('auth_easysaml/confignomcryptnotice',
-            '', new lang_string('nomcryptnotice', 'auth_easysaml')
-        ));
-    }
+    $settings->add(new admin_setting_configcheckbox('auth_easysaml/signmetadata',
+        new lang_string('signmetadata', 'auth_easysaml'), '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox('auth_easysaml/signauthrequests',
+        new lang_string('signauthrequests', 'auth_easysaml'), '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox('auth_easysaml/signlogoutrequests',
+        new lang_string('signlogoutrequests', 'auth_easysaml'), '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox('auth_easysaml/signlogoutresponses',
+        new lang_string('signlogoutresponses', 'auth_easysaml'), '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox('auth_easysaml/encryptnameid',
+        new lang_string('encryptnameid', 'auth_easysaml'), '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox('auth_easysaml/wantencryptedasserts',
+        new lang_string('wantencryptedasserts', 'auth_easysaml'), '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox('auth_easysaml/wantencryptednameid',
+        new lang_string('wantencryptednameid', 'auth_easysaml'), '',
+        0
+    ));
 
     $settings->add(new admin_setting_configcheckbox('auth_easysaml/wantsignedasserts',
         new lang_string('wantsignedasserts', 'auth_easysaml'), '',

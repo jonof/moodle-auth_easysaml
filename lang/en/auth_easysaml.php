@@ -46,7 +46,6 @@ $string['idp_certfingerprint_desc'] = 'The fingerprint of the certificate that s
 $string['logoutmessage'] = 'Your browser should redirect automatically to complete the logout operation. If it does not, please press the "Continue" button below.';
 $string['idp_certfingerprintalgo'] = 'Certificate fingerprint algorithm';
 $string['idp_certfingerprintalgo_desc'] = '';
-$string['nomcryptnotice'] = 'The PHP mcrypt module is not enabled so many encryption and signing functions are not available.';
 $string['pluginname'] = 'Easy SAML';
 $string['prefersso'] = 'Prefer SSO';
 $string['prefersso_desc'] = 'Whether to automatically send the user for sign on when the login page is accessed. When this is enabled, the redirection can be avoided with <code>{$a}</code>.';

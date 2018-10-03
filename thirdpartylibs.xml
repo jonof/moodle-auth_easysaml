@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>lib/Saml2</location>
+        <name>php-saml</name>
+        <version>v3.0.0</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>lib/xmlseclibs</location>
+        <name>xmlseclibs</name>
+        <version>v3.0.2</version>
+        <license>BSD-3-Clause</license>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>

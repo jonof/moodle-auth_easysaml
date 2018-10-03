@@ -32,7 +32,7 @@ class auth_easysaml_helper {
     public function __construct() {
         // The essence of _toolkit_loader.php.
         $path = __DIR__ . '/../';
-        require_once $path . '/extlib/xmlseclibs/xmlseclibs.php';
+        require_once $path . '/lib/xmlseclibs/xmlseclibs.php';
         foreach (glob($path . '/lib/Saml2/*.php') as $file) {
             require_once $file;
         }
@@ -105,7 +105,7 @@ class auth_easysaml_helper {
 
     /**
      * Prepares a configured instance of the SAML Auth object.
-     * @return OneLogin_Saml2_Auth
+     * @return OneLogin\Saml2\Auth
      */
     public function get_auth() {
         global $CFG;
@@ -133,10 +133,10 @@ class auth_easysaml_helper {
                 'singleLogoutService' => array(
                     'url' => $wwwroot . '/auth/easysaml/sls.php',
                     'binding' => $config->idp_slobinding === 'post' ?
-                        OneLogin_Saml2_Constants::BINDING_HTTP_POST :
-                        OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT
+                        OneLogin\Saml2\Constants::BINDING_HTTP_POST :
+                        OneLogin\Saml2\Constants::BINDING_HTTP_REDIRECT
                 ),
-                'NameIDFormat' => OneLogin_Saml2_Constants::NAMEID_UNSPECIFIED,
+                'NameIDFormat' => OneLogin\Saml2\Constants::NAMEID_UNSPECIFIED,
             ),
 
             // Define our identity provider.
@@ -156,8 +156,8 @@ class auth_easysaml_helper {
                 'url' => $config->idp_slourl,
                 'responseUrl' => $config->idp_sloresponseurl,
                 'binding' => $config->idp_slobinding === 'post' ?
-                    OneLogin_Saml2_Constants::BINDING_HTTP_POST :
-                    OneLogin_Saml2_Constants::BINDING_HTTP_REDIRECT,
+                    OneLogin\Saml2\Constants::BINDING_HTTP_POST :
+                    OneLogin\Saml2\Constants::BINDING_HTTP_REDIRECT,
             );
         }
 
@@ -170,21 +170,19 @@ class auth_easysaml_helper {
             );
         }
 
-        if (extension_loaded('mcrypt')) {
-            if (!empty($config->sp_cert) && !empty($config->sp_privatekey)) {
-                $settings['sp']['x509cert'] = $config->sp_cert;
-                $settings['sp']['privateKey'] = $config->sp_privatekey;
-            }
-
-            $slopost = $config->idp_slobinding === 'post';
-            $settings['security']['signMetadata'] = !empty($config->signmetadata);
-            $settings['security']['nameIdEncrypted'] = !empty($config->encryptnameid);
-            $settings['security']['authnRequestsSigned'] = !empty($config->signauthrequests);
-            $settings['security']['logoutRequestSigned'] = !empty($config->signlogoutrequests) && !$slopost;
-            $settings['security']['logoutResponseSigned'] = !empty($config->signlogoutresponses) && !$slopost;
-            $settings['security']['wantAssertionsEncrypted'] = !empty($config->wantencryptedasserts);
-            $settings['security']['wantNameIdEncrypted'] = !empty($config->wantencryptednameid);
+        if (!empty($config->sp_cert) && !empty($config->sp_privatekey)) {
+            $settings['sp']['x509cert'] = $config->sp_cert;
+            $settings['sp']['privateKey'] = $config->sp_privatekey;
         }
+
+        $slopost = $config->idp_slobinding === 'post';
+        $settings['security']['signMetadata'] = !empty($config->signmetadata);
+        $settings['security']['nameIdEncrypted'] = !empty($config->encryptnameid);
+        $settings['security']['authnRequestsSigned'] = !empty($config->signauthrequests);
+        $settings['security']['logoutRequestSigned'] = !empty($config->signlogoutrequests) && !$slopost;
+        $settings['security']['logoutResponseSigned'] = !empty($config->signlogoutresponses) && !$slopost;
+        $settings['security']['wantAssertionsEncrypted'] = !empty($config->wantencryptedasserts);
+        $settings['security']['wantNameIdEncrypted'] = !empty($config->wantencryptednameid);
         $settings['security']['wantAssertionsSigned'] = !empty($config->wantsignedasserts);
         $settings['security']['wantMessagesSigned'] = !empty($config->wantsignedmessages);
 
@@ -196,7 +194,7 @@ class auth_easysaml_helper {
             $settings['idp']['certFingerprintAlgorithm'] = $config->idp_certfingerprintalgo;
         }
 
-        $auth = new OneLogin_Saml2_Auth($settings);
+        $auth = new OneLogin\Saml2\Auth($settings);
         return $auth;
     }
 
